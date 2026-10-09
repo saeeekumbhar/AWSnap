@@ -51,12 +51,12 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#161D26] bg-tech-grid flex flex-col text-[#F5F3FF]">
+    <div className="h-screen max-h-screen bg-[#161D26] bg-tech-grid flex flex-col text-[#F5F3FF] overflow-hidden">
       {/* Top Header with AWS SBG Logo & Branding */}
       <BrandHeader />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-2 sm:py-3 overflow-hidden">
         {appState === 'capture' && (
           <CameraView
             playerName={playerName}
@@ -85,7 +85,7 @@ export default function App() {
       </main>
 
       {/* Understated Event Watermark Footer */}
-      <footer className="w-full py-3 text-center border-t border-[#2E2640]/30 text-[11px] font-mono text-[#645B7F]">
+      <footer className="w-full py-2 text-center border-t border-[#2E2640]/30 text-[10px] font-mono text-[#645B7F] flex-shrink-0">
         AWS Student Builders Guild - NMIET Event Edition - Local Photo Booth
       </footer>
     </div>

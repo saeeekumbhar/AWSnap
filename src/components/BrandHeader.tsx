@@ -3,7 +3,7 @@ import { AwsSbgLogo } from './AwsSbgLogo';
 
 export const BrandHeader: React.FC = () => {
   return (
-    <header className="w-full flex items-center justify-between py-4 px-6 sm:px-8 border-b border-[#2E2640]/50 bg-[#161D26] z-20">
+    <header className="w-full flex items-center justify-between py-2.5 sm:py-3 px-6 sm:px-8 border-b border-[#2E2640]/50 bg-[#161D26] z-20 flex-shrink-0">
       {/* Brand Identity at top-left */}
       <div className="flex items-center gap-3">
         <AwsSbgLogo size={42} />
