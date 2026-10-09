@@ -86,7 +86,7 @@ export default function App() {
 
       {/* Understated Event Watermark Footer */}
       <footer className="w-full py-2 text-center border-t border-[#2E2640]/30 text-[10px] font-mono text-[#645B7F] flex-shrink-0">
-        AWS Student Builders Guild - NMIET Event Edition - Local Photo Booth
+        All Rights Reserved - AWS SBG NMIET
       </footer>
     </div>
   );
