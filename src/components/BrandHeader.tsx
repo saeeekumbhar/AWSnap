@@ -15,8 +15,11 @@ export const BrandHeader: React.FC = () => {
 
       {/* Subtle Technical Badge on top-right */}
       <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded border border-[#3B3252] bg-[#1E2633]/60 text-xs font-mono text-[#B8AECF]">
-        <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
-        <span>PHOTO BOOTH LIVE</span>
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C084FC] opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C084FC] shadow-[0_0_8px_#C084FC]"></span>
+        </span>
+        <span>8-BIT PHOTOBOOTH LIVE</span>
       </div>
     </header>
   );
