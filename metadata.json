@@ -1,0 +1,6 @@
+{
+  "name": "AWSnap by AWS SBG NMIET",
+  "description": "8-bit avatar photo booth for AWS Student Builders Guild community events at NMIET. Snap a photo and generate a Minecraft-style collectible pixel card.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
