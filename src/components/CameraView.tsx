@@ -148,24 +148,14 @@ export const CameraView: React.FC<CameraViewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col items-center px-4 py-4 sm:py-8">
+    <div className="w-full max-w-6xl mx-auto flex items-center justify-center px-4 py-1">
       {/* Hidden canvas for capturing video frames */}
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* Main Heading with Typing Animation */}
-      <div className="text-center mb-6">
-        <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#F5F3FF] font-sans mb-2">
-          <TypewriterText text="Get your AWS avatar." speed={60} />
-        </h1>
-        <p className="text-sm sm:text-base text-[#B8AECF] font-medium tracking-wide">
-          Step in. Snap a photo. Meet your 8-bit self.
-        </p>
-      </div>
-
-      {/* Main Booth Layout: Preview on Left, Controls on Right */}
-      <div className="w-full flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10">
-        {/* Camera Area Frame */}
-        <div className="relative w-full max-w-[500px] aspect-[4/3] sm:aspect-square bg-[#121820] rounded-xl overflow-hidden border-2 border-[#6B21A8] shadow-[0_0_24px_rgba(107,33,168,0.25)] flex items-center justify-center flex-shrink-0">
+      {/* Main Booth Layout: Preview on Left, Title + Controls on Right */}
+      <div className="w-full flex flex-col md:flex-row items-center justify-center gap-8 md:gap-10 lg:gap-14">
+        {/* Camera Area Frame (Enlarged) */}
+        <div className="relative w-full max-w-[480px] sm:max-w-[510px] aspect-square bg-[#121820] rounded-xl overflow-hidden border-2 border-[#6B21A8] shadow-[0_0_24px_rgba(107,33,168,0.25)] flex items-center justify-center flex-shrink-0">
           {/* Subtle decorative stepped pixel corners */}
           <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-[#A855F7] z-10 pointer-events-none" />
           <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-[#A855F7] z-10 pointer-events-none" />
@@ -248,52 +238,65 @@ export const CameraView: React.FC<CameraViewProps> = ({
           )}
         </div>
 
-        {/* Right Side: Name Input & Capture Button */}
-        <div className="w-full max-w-[360px] flex flex-col justify-center gap-6">
-          {/* Player Name Input Field */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold uppercase tracking-wider text-[#B8AECF] flex items-center justify-between">
-              <span>Card Player Name</span>
-              <span className="text-[10px] text-[#A855F7] font-mono">OPTIONAL</span>
-            </label>
-            <input
-              type="text"
-              value={playerName}
-              onChange={(e) => onPlayerNameChange(e.target.value.slice(0, 18))}
-              placeholder="PIXEL PLAYER"
-              className="w-full px-4 py-2.5 rounded-lg bg-[#121820] border border-[#3B3252] focus:border-[#A855F7] focus:outline-none text-[#F5F3FF] placeholder-[#645B7F] text-sm font-medium tracking-wide transition-colors"
-            />
+        {/* Right Side: Heading Text over Player Name Card & Capture Controls */}
+        <div className="w-full max-w-[360px] sm:max-w-[400px] flex flex-col justify-center gap-4 sm:gap-5">
+          {/* Main Heading shifted here over the player name card */}
+          <div className="text-left flex flex-col gap-1">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#F5F3FF] font-sans leading-tight">
+              <TypewriterText text="Get your AWS avatar." speed={60} />
+            </h1>
+            <p className="text-xs sm:text-sm text-[#B8AECF] font-medium tracking-wide">
+              Step in. Snap a photo. Meet your 8-bit self.
+            </p>
           </div>
 
-          {/* Capture Interaction Button */}
-          <div className="flex flex-col gap-3">
-            <button
-              onClick={handleStartCapture}
-              disabled={isCapturing || !!cameraError || isInitializing}
-              className="w-full py-4 px-6 rounded-lg bg-[#FF9900] hover:bg-[#FFA826] active:bg-[#E68A00] disabled:bg-[#4B3E2F] disabled:text-[#8E7E6E] disabled:cursor-not-allowed text-[#161D26] font-pixel text-sm sm:text-base tracking-wider uppercase font-bold transition-all duration-150 transform active:scale-[0.99] shadow-[0_4px_20px_rgba(255,153,0,0.3)] flex items-center justify-center gap-3 cursor-pointer"
-            >
-              <Camera className="w-5 h-5 text-[#161D26]" />
-              <span>{isCapturing ? 'SNAPPING...' : 'CAPTURE MY AVATAR'}</span>
-            </button>
+          {/* Player Name & Action Card */}
+          <div className="w-full bg-[#121820]/90 border border-[#2E2640] rounded-2xl p-5 sm:p-6 shadow-2xl flex flex-col gap-5">
+            {/* Player Name Input Field */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-[#B8AECF] flex items-center justify-between">
+                <span>Card Player Name</span>
+                <span className="text-[10px] text-[#A855F7] font-mono">OPTIONAL</span>
+              </label>
+              <input
+                type="text"
+                value={playerName}
+                onChange={(e) => onPlayerNameChange(e.target.value.slice(0, 18))}
+                placeholder="PIXEL PLAYER"
+                className="w-full px-4 py-2.5 rounded-lg bg-[#161D26] border border-[#3B3252] focus:border-[#A855F7] focus:outline-none text-[#F5F3FF] placeholder-[#645B7F] text-sm font-medium tracking-wide transition-colors"
+              />
+            </div>
 
-            {/* Alternative upload trigger if user prefers */}
-            {!cameraError && (
-              <div className="text-center">
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="text-xs text-[#B8AECF] hover:text-[#A855F7] transition-colors underline cursor-pointer"
-                >
-                  Or upload an existing photo from laptop
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </div>
-            )}
+            {/* Capture Interaction Button */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleStartCapture}
+                disabled={isCapturing || !!cameraError || isInitializing}
+                className="w-full py-4 px-6 rounded-xl bg-[#FF9900] hover:bg-[#FFA826] active:bg-[#E68A00] disabled:bg-[#4B3E2F] disabled:text-[#8E7E6E] disabled:cursor-not-allowed text-[#161D26] font-pixel text-sm sm:text-base tracking-wider uppercase font-bold transition-all duration-150 transform active:scale-[0.99] shadow-[0_4px_20px_rgba(255,153,0,0.3)] flex items-center justify-center gap-3 cursor-pointer"
+              >
+                <Camera className="w-5 h-5 text-[#161D26]" />
+                <span>{isCapturing ? 'SNAPPING...' : 'CAPTURE MY AVATAR'}</span>
+              </button>
+
+              {/* Alternative upload trigger if user prefers */}
+              {!cameraError && (
+                <div className="text-center pt-1">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-xs text-[#B8AECF] hover:text-[#A855F7] transition-colors underline cursor-pointer"
+                  >
+                    Or upload an existing photo from laptop
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
