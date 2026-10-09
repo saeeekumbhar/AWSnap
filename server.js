@@ -67,78 +67,86 @@ async function startServer() {
           characterDescription: "AWS Student Builder ready for production deployment."
         });
       }
-      const prompt = `You are a master 8-bit retro pixel art character designer for the AWSnap photo booth at AWS Student Builders Guild NMIET.
-Analyze this visitor webcam photo and create an authentic, personalized 8-bit pixel art character avatar profile inspired by high-quality retro game and anime pixel art portraits.
+      console.log(`[AWSnap API] Received avatar generation request (${cleanBase64.length} chars)`);
+      const prompt = `Analyze this real photograph of a person taken at the AWSnap event photo booth.
+Your task is to accurately extract their real visual features so we can generate an authentic, personalized 8-bit retro pixel art avatar portrait that truly looks like THEM.
 
-Examine the person in the photo and extract their visual characteristics so they get a UNIQUE, NON-GENERIC pixel art portrait matching their real look:
+CRITICAL INSTRUCTIONS:
+1. GENDER & PRESENTATION:
+   - Carefully determine if the person presents as female or male.
+   - For a female, set isFemale: true and gender: "female".
+   - For a male, set isFemale: false and gender: "male".
+   - Feminine avatars will get delicate facial features, anime eye lashes, soft lips, and authentic female hair/outfit options.
 
-1. Archetype / Vibe: Choose the best matching style from:
-   ["retro_hoodie", "anime_pixel", "minecraft_scenic", "aesthetic_bob", "curly_retro"]
+2. REAL CLOTHING & OUTFIT (LOOK CAREFULLY AT WHAT THEY ARE ACTUALLY WEARING):
+   - clothingType: Identify what they are wearing:
+       "tshirt" (crewneck/v-neck t-shirt)
+       "hoodie" (hoodie / sweatshirt with hood and drawstrings)
+       "sweater" (knit sweater / turtleneck)
+       "collared_shirt" (formal or casual button-up shirt with collar)
+       "jacket_tee" (jacket or denim over a t-shirt)
+       "tank_top" (sleeveless top / tank)
+       "zipper_polo" (polo with zipper or collar)
+   - clothingPrimary: Sample the EXACT dominant hex color of their top/shirt from the photo! (Do not default to green or orange. If they wear black, use #1A1A1A. If white, #F3F4F6. If navy, #1E293B. If beige, #D4C3B3. If red, #DC2626, etc.)
+   - clothingSecondary: Accent color (collar, drawstrings, buttons, undershirt, or trim) sampled from the photo.
+   - clothingDetail: "drawstrings" | "swoosh" | "chain" | "zipper" | "buttons" | "none".
 
-2. Skin tone:
-   - skinTone: accurate base skin hex (e.g. #FCD0B4, #F5C29B, #D49B72, #99603B, #5C3A21, etc.)
-   - skinShade: darker contour/shadow hex for jaw and neck
-   - skinHighlight: subtle lighter highlight hex for forehead/nose
-   - hasBlush: true if rosy cheeks or freckles visible
+3. HAIR STYLE & COLOR:
+   - Look at their hair length, cut, and texture:
+       "long_straight" (long hair cascading down shoulders)
+       "long_wavy" (long flowing wavy hair past shoulders)
+       "messy_bun_clip" (high top bun with loose side strands & clip)
+       "bob_straight_bangs" (sleek bob with straight forehead bangs)
+       "ponytail" (high ponytail with front bangs)
+       "curly_volume" (voluminous curls / afro / ringlets)
+       "messy_anime_layers" (textured layered bangs)
+       "minecraft_wavy" (wavy textured short/medium hair)
+       "short_crop_fade" (clean modern short crop / fade)
+       "buzzcut" (buzzcut or very short)
+       "side_part" (classic neat side part)
+   - hairColor: EXACT hex color sampled from their hair.
+   - hairHighlight: lighter strand highlight hex.
+   - hairShadow: deeper shadow hex.
+   - hasHairClip: true if hair clip / pin / barrette is visible.
 
-3. Hair:
-   - hairStyle: one of [
-       "messy_bun_clip",      // top bun with loose side strands and hair clip (like anime pixel art)
-       "minecraft_wavy",      // textured wavy layered hair
-       "curly_volume",        // voluminous curly hair with defined curl clusters
-       "messy_anime_layers",  // layered parted anime bangs framing face
-       "bob_straight_bangs",  // classic sleek bob cut with straight bangs
-       "long_wavy_flow",      // long flowing hair over shoulders
-       "short_textured_fade", // clean modern fade/crop
-       "spiky_anime",         // textured spiky locks
-       "side_swept"           // side-parted clean sweep
-     ]
-   - hairColor: accurate base hex
-   - hairHighlight: lighter strand highlight hex
-   - hairShadow: deeper shadow hex
-   - hasHairClip: boolean (true if hair clip or accessory visible)
+4. SKIN TONE:
+   - skinTone: Sample the true base skin tone hex directly from their face (e.g. #FCD0B4, #F5C29B, #E0AA8B, #C68642, #8D5524, #5C3836).
+   - skinShade: slightly darker contour/shadow tone hex.
+   - skinHighlight: subtle lighter highlight hex.
+   - hasBlush: true if rosy cheeks, makeup, or freckles.
 
-4. Eyeglasses:
-   - hasGlasses: boolean (true if wearing eyeglasses or sunglasses)
-   - glassesStyle: "round_wire" | "thick_rectangular" | "oval_rimless" | "sunglasses" | "none"
-   - glassesColor: hex code (e.g. #161D26, #8D5524, #A855F7, etc.)
+5. EYEGLASSES:
+   - hasGlasses: true if wearing glasses or sunglasses.
+   - glassesStyle: "round_wire" | "thick_rectangular" | "oval_rimless" | "sunglasses" | "none".
+   - glassesColor: frame hex color.
 
-5. Facial Hair:
-   - hasFacialHair: boolean (true if beard, mustache or stubble)
-   - facialHairStyle: "full_beard_mustache" | "goatee" | "stubble" | "none"
-   - beardColor: hex code
+6. FACIAL HAIR:
+   - hasFacialHair: true ONLY if beard, mustache, or stubble is visible (usually false for females).
+   - facialHairStyle: "full_beard" | "mustache" | "stubble" | "none".
+   - beardColor: beard hex color.
 
-6. Eyes & Expression:
-   - eyeColor: hex code
-   - eyeStyle: "anime_sparkle" | "warm_friendly" | "cool_relaxed" | "squinting_smile"
-   - expression: "smile" | "grin" | "calm" | "confident" | "cute_smirk"
+7. ACCESSORIES & DETAILS:
+   - hasEarrings: true if earrings or studs visible on ears.
+   - hasNecklace: true if necklace or chain visible on neck.
 
-7. Clothing:
-   - clothingType: "hoodie_drawstrings" | "sweater_necklace" | "zipper_polo" | "graphic_tee" | "jacket_over_shirt"
-   - clothingPrimary: dominant color of their shirt/top (hex code)
-   - clothingSecondary: accent color for drawstrings/collar/zipper (hex code)
-   - clothingDetail: "swoosh" | "chain" | "zipper" | "drawstrings" | "none"
+8. EXPRESSION & EYES:
+   - expression: "smile" | "grin" | "calm" | "cute_smirk".
+   - eyeColor: eye iris hex color.
+   - eyeStyle: for females usually "anime_sparkle" or "warm_friendly"; for males "warm_friendly", "cool_relaxed", or "squinting_smile".
 
-8. Accessories:
-   - hasEarrings: boolean (true if earrings visible)
-   - hasNecklace: boolean (true if necklace visible)
+9. BACKGROUND HARMONY:
+   - backgroundStyle: "sunflower_field" | "pastel_sky_blue" | "aesthetic_purple" | "warm_cream_studio" | "clean_white_minimal" | "soft_pink_pastel" | "cyber_mint".
+   - backgroundColor: hex color that complements their clothing and skin.
 
-9. Background:
-   - backgroundStyle: "sunflower_field" | "pastel_sky_blue" | "aesthetic_purple" | "warm_cream_studio" | "clean_white_minimal"
-   - backgroundColor: hex code
+10. STATS:
+   - rizzLevel, flagStatus, auraPoints, socialBattery (creative, fun AWS builder stats).
 
-10. Event Stats:
-   - rizzLevel: e.g. "10/10", "11/10", "Over 9000", "100%", "Certified", "W Rizz"
-   - flagStatus: e.g. "Green?", "Super Green", "All Green", "Clean Green", "Green Flag"
-   - auraPoints: e.g. "1000+", "5000+", "9999+", "+Infinity", "10,000+"
-   - socialBattery: e.g. "LOW", "CHARGING", "42%", "REBOOTING", "FULL"
-   - characterDescription: one-sentence fun character title
-
-Respond strictly with valid JSON without markdown fences.`;
+Return valid JSON with these fields.`;
       const candidateModels = ["gemini-2.5-flash", "gemini-3.8-flash", "gemini-flash-latest"];
-      let responseText = "";
+      let parsedData = null;
       for (const modelName of candidateModels) {
         try {
+          console.log(`[AWSnap API] Querying Gemini model: ${modelName}`);
           const response = await ai.models.generateContent({
             model: modelName,
             contents: [
@@ -156,71 +164,77 @@ Respond strictly with valid JSON without markdown fences.`;
                   }
                 ]
               }
-            ]
+            ],
+            config: {
+              responseMimeType: "application/json"
+            }
           });
           if (response && response.text) {
-            responseText = response.text.trim();
+            const raw = response.text.trim();
+            console.log(`[AWSnap API] Response from ${modelName}:`, raw.slice(0, 200));
+            parsedData = JSON.parse(raw);
             break;
           }
         } catch (mErr) {
-          console.warn(`Model ${modelName} call failed, trying next:`, mErr?.message || mErr);
+          console.warn(`[AWSnap API] Model ${modelName} call failed, trying next:`, mErr?.message || mErr);
         }
       }
-      let cleanJson = responseText;
-      if (cleanJson.startsWith("```json")) {
-        cleanJson = cleanJson.replace(/^```json\s*/, "").replace(/\s*```$/, "");
-      } else if (cleanJson.startsWith("```")) {
-        cleanJson = cleanJson.replace(/^```\s*/, "").replace(/\s*```$/, "");
+      if (!parsedData) {
+        console.warn("[AWSnap API] Vision parsing returned no data, using intelligent fallback");
+        parsedData = {};
       }
-      let parsedData = {};
-      try {
-        if (cleanJson) {
-          parsedData = JSON.parse(cleanJson);
-        }
-      } catch (parseErr) {
-        console.warn("Failed to parse Gemini response as JSON:", responseText);
-      }
+      const isFemale = Boolean(parsedData.isFemale || parsedData.gender === "female");
+      const detectedTraits = {
+        gender: isFemale ? "female" : "male",
+        isFemale,
+        archetype: parsedData.archetype || (isFemale ? "anime_pixel" : "retro_hoodie"),
+        skinTone: parsedData.skinTone || (isFemale ? "#FCD0B4" : "#E0AA8B"),
+        skinShade: parsedData.skinShade || (isFemale ? "#E8B69A" : "#C58F6E"),
+        skinHighlight: parsedData.skinHighlight || (isFemale ? "#FEE6D6" : "#FADBC7"),
+        hasBlush: parsedData.hasBlush !== void 0 ? Boolean(parsedData.hasBlush) : isFemale,
+        hairStyle: parsedData.hairStyle || (isFemale ? "long_straight" : "short_crop_fade"),
+        hairColor: parsedData.hairColor || "#2C1B10",
+        hairHighlight: parsedData.hairHighlight || "#4A3222",
+        hairShadow: parsedData.hairShadow || "#1A0E08",
+        hasHairClip: Boolean(parsedData.hasHairClip),
+        eyeColor: parsedData.eyeColor || "#2B4A6F",
+        eyeStyle: parsedData.eyeStyle || (isFemale ? "anime_sparkle" : "warm_friendly"),
+        hasGlasses: Boolean(parsedData.hasGlasses),
+        glassesStyle: parsedData.glassesStyle || (parsedData.hasGlasses ? isFemale ? "round_wire" : "thick_rectangular" : "none"),
+        glassesColor: parsedData.glassesColor || "#161D26",
+        hasFacialHair: !isFemale && Boolean(parsedData.hasFacialHair),
+        facialHairStyle: !isFemale && parsedData.facialHairStyle ? parsedData.facialHairStyle : "none",
+        beardColor: parsedData.beardColor || parsedData.hairColor || "#2C1B10",
+        clothingType: parsedData.clothingType || (isFemale ? "tshirt" : "hoodie"),
+        clothingPrimary: parsedData.clothingPrimary || (isFemale ? "#374151" : "#1E293B"),
+        clothingSecondary: parsedData.clothingSecondary || "#9CA3AF",
+        clothingDetail: parsedData.clothingDetail || "none",
+        hasEarrings: parsedData.hasEarrings !== void 0 ? Boolean(parsedData.hasEarrings) : isFemale,
+        hasNecklace: Boolean(parsedData.hasNecklace),
+        backgroundStyle: parsedData.backgroundStyle || (isFemale ? "aesthetic_purple" : "pastel_sky_blue"),
+        backgroundColor: parsedData.backgroundColor || (isFemale ? "#6A567A" : "#88BEE8"),
+        expression: parsedData.expression || "smile"
+      };
+      console.log(`[AWSnap API] Extracted character traits for ${playerName}:`, {
+        gender: detectedTraits.gender,
+        hairStyle: detectedTraits.hairStyle,
+        clothingType: detectedTraits.clothingType,
+        clothingPrimary: detectedTraits.clothingPrimary,
+        hasGlasses: detectedTraits.hasGlasses
+      });
       return res.json({
         success: true,
-        traits: {
-          archetype: parsedData.archetype || "retro_hoodie",
-          skinTone: parsedData.skinTone || "#E0AA8B",
-          skinShade: parsedData.skinShade || "#C58F6E",
-          skinHighlight: parsedData.skinHighlight || "#FADBC7",
-          hasBlush: Boolean(parsedData.hasBlush),
-          hairStyle: parsedData.hairStyle || "curly_volume",
-          hairColor: parsedData.hairColor || "#3C2817",
-          hairHighlight: parsedData.hairHighlight || "#5A3D22",
-          hairShadow: parsedData.hairShadow || "#26190E",
-          hasHairClip: Boolean(parsedData.hasHairClip),
-          eyeColor: parsedData.eyeColor || "#2B4A6F",
-          eyeStyle: parsedData.eyeStyle || "warm_friendly",
-          hasGlasses: Boolean(parsedData.hasGlasses),
-          glassesStyle: parsedData.glassesStyle || (parsedData.hasGlasses ? "thick_rectangular" : "none"),
-          glassesColor: parsedData.glassesColor || "#161D26",
-          hasFacialHair: Boolean(parsedData.hasFacialHair || parsedData.hasBeard),
-          facialHairStyle: parsedData.facialHairStyle || (parsedData.hasBeard ? "full_beard_mustache" : "none"),
-          beardColor: parsedData.beardColor || parsedData.hairColor || "#3C2817",
-          clothingType: parsedData.clothingType || "hoodie_drawstrings",
-          clothingPrimary: parsedData.clothingPrimary || "#2E7D32",
-          clothingSecondary: parsedData.clothingSecondary || "#D32F2F",
-          clothingDetail: parsedData.clothingDetail || "drawstrings",
-          hasEarrings: Boolean(parsedData.hasEarrings),
-          hasNecklace: Boolean(parsedData.hasNecklace),
-          backgroundStyle: parsedData.backgroundStyle || "pastel_sky_blue",
-          backgroundColor: parsedData.backgroundColor || "#88BEE8",
-          expression: parsedData.expression || "smile"
-        },
+        traits: detectedTraits,
         stats: {
           rizzLevel: parsedData.stats?.rizzLevel || "10/10",
           flagStatus: parsedData.stats?.flagStatus || "Green?",
           auraPoints: parsedData.stats?.auraPoints || "1000+",
           socialBattery: parsedData.stats?.socialBattery || "LOW"
         },
-        characterDescription: parsedData.characterDescription || "AWS Student Builder 8-bit Avatar"
+        characterDescription: parsedData.characterDescription || "Personalized AWSnap 8-bit Avatar"
       });
     } catch (err) {
-      console.error("Error generating avatar:", err);
+      console.error("[AWSnap API] Unhandled error generating avatar:", err);
       return res.status(500).json({
         error: err.message || "Avatar generation failed",
         fallbackTraits: {

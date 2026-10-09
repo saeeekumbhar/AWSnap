@@ -5,6 +5,8 @@
  */
 
 export interface AvatarTraits {
+  gender?: 'female' | 'male';
+  isFemale?: boolean;
   archetype?: 'retro_hoodie' | 'anime_pixel' | 'minecraft_scenic' | 'aesthetic_bob' | 'curly_retro';
   skinTone: string;
   skinShade?: string;
@@ -15,6 +17,7 @@ export interface AvatarTraits {
   hairHighlight?: string;
   hairShadow?: string;
   hasHairClip?: boolean;
+  hairClipColor?: string;
   eyeColor: string;
   eyeStyle?: string;
   hasGlasses: boolean;
@@ -44,33 +47,35 @@ export interface CardStats {
 }
 
 export const DEFAULT_TRAITS: AvatarTraits = {
-  archetype: 'curly_retro',
-  skinTone: '#E0AA8B',
-  skinShade: '#C58F6E',
-  skinHighlight: '#FADBC7',
+  gender: 'female',
+  isFemale: true,
+  archetype: 'anime_pixel',
+  skinTone: '#FCD0B4',
+  skinShade: '#E8B69A',
+  skinHighlight: '#FEE6D6',
   hasBlush: true,
-  hairStyle: 'curly_volume',
-  hairColor: '#3C2817',
-  hairHighlight: '#5A3D22',
-  hairShadow: '#26190E',
+  hairStyle: 'long_straight',
+  hairColor: '#2C1B10',
+  hairHighlight: '#4A3222',
+  hairShadow: '#1A0E08',
   hasHairClip: false,
   eyeColor: '#2B4A6F',
-  eyeStyle: 'warm_friendly',
-  hasGlasses: true,
-  glassesStyle: 'thick_rectangular',
+  eyeStyle: 'anime_sparkle',
+  hasGlasses: false,
+  glassesStyle: 'none',
   glassesColor: '#161D26',
   hasFacialHair: false,
   facialHairStyle: 'none',
-  beardColor: '#3C2817',
-  clothingType: 'hoodie_drawstrings',
-  clothingPrimary: '#2E7D32',
-  clothingSecondary: '#D32F2F',
-  clothingDetail: 'drawstrings',
-  clothingStyle: 'hoodie',
-  hasEarrings: false,
+  beardColor: '#2C1B10',
+  clothingType: 'tshirt',
+  clothingPrimary: '#374151',
+  clothingSecondary: '#9CA3AF',
+  clothingDetail: 'none',
+  clothingStyle: 'tshirt',
+  hasEarrings: true,
   hasNecklace: false,
-  backgroundStyle: 'pastel_sky_blue',
-  backgroundColor: '#88BEE8',
+  backgroundStyle: 'aesthetic_purple',
+  backgroundColor: '#6A567A',
   expression: 'smile',
 };
 
@@ -115,11 +120,9 @@ function renderBackground(ctx: CanvasRenderingContext2D, traits: AvatarTraits, s
 
     // Pixel Clouds
     ctx.fillStyle = '#E8EEF5';
-    // Cloud Left
     ctx.fillRect(2, 4, 12, 3);
     ctx.fillRect(5, 2, 7, 2);
     ctx.fillRect(4, 7, 8, 1);
-    // Cloud Right
     ctx.fillRect(28, 6, 16, 3);
     ctx.fillRect(32, 4, 9, 2);
 
@@ -131,18 +134,15 @@ function renderBackground(ctx: CanvasRenderingContext2D, traits: AvatarTraits, s
     ctx.fillStyle = '#486E20';
     ctx.fillRect(0, 22, size, size - 22);
 
-    const drawSunflower = (cx: number, cy: number, scale = 1) => {
-      // Stem
+    const drawSunflower = (cx: number, cy: number) => {
       ctx.fillStyle = '#3E611E';
       ctx.fillRect(cx, cy + 2, 1, 6);
-      // Yellow petals
       ctx.fillStyle = '#F5C22D';
       ctx.fillRect(cx - 2, cy - 1, 5, 4);
       ctx.fillRect(cx - 1, cy - 2, 3, 6);
       ctx.fillStyle = '#E0AB1E';
       ctx.fillRect(cx - 2, cy, 1, 2);
       ctx.fillRect(cx + 2, cy, 1, 2);
-      // Brown center
       ctx.fillStyle = '#4E3114';
       ctx.fillRect(cx - 1, cy, 3, 2);
     };
@@ -154,66 +154,81 @@ function renderBackground(ctx: CanvasRenderingContext2D, traits: AvatarTraits, s
     drawSunflower(1, 31);
     drawSunflower(45, 33);
   } else if (bgStyle === 'aesthetic_purple' || traits.archetype === 'anime_pixel') {
-    // Muted aesthetic purple/lavender
     ctx.fillStyle = traits.backgroundColor || '#604D6E';
     ctx.fillRect(0, 0, size, size);
-
     ctx.fillStyle = adjustBrightness(traits.backgroundColor || '#604D6E', -12);
     ctx.fillRect(0, size - 14, size, 14);
   } else if (bgStyle === 'warm_cream_studio' || traits.archetype === 'aesthetic_bob') {
-    // Soft warm cream
     ctx.fillStyle = '#F2E8D8';
     ctx.fillRect(0, 0, size, size);
-
     ctx.fillStyle = '#EBE1D0';
     for (let x = 0; x < size; x += 4) {
       ctx.fillRect(x, 0, 1, size);
     }
+  } else if (bgStyle === 'soft_pink_pastel') {
+    ctx.fillStyle = '#FCE7F3';
+    ctx.fillRect(0, 0, size, size);
+    ctx.fillStyle = '#FBCFE8';
+    ctx.fillRect(0, size - 12, size, 12);
   } else if (bgStyle === 'clean_white_minimal') {
     ctx.fillStyle = '#FAFAFA';
     ctx.fillRect(0, 0, size, size);
   } else {
-    // Default: Pastel sky blue
+    // Pastel sky blue default
     ctx.fillStyle = traits.backgroundColor || '#88BEE8';
     ctx.fillRect(0, 0, size, size);
-
     ctx.fillStyle = adjustBrightness(traits.backgroundColor || '#88BEE8', 12);
     ctx.fillRect(0, 0, size, 8);
   }
 }
 
 /**
- * Draws torso and clothing
+ * Draws torso and clothing matching the real outfit
  */
 function renderTorso(ctx: CanvasRenderingContext2D, traits: AvatarTraits, size: number) {
-  const primary = traits.clothingPrimary || '#2E7D32';
+  const isFemale = Boolean(traits.isFemale || traits.gender === 'female');
+  const primary = traits.clothingPrimary || (isFemale ? '#374151' : '#1E293B');
   const primaryDark = adjustBrightness(primary, -18);
   const primaryLight = adjustBrightness(primary, 15);
   const secondary = traits.clothingSecondary || '#D32F2F';
+  const type = traits.clothingType || (isFemale ? 'tshirt' : 'hoodie');
 
-  const type = traits.clothingType || 'hoodie_drawstrings';
+  // Feminine shoulders are slightly narrower (margin 9-10 vs 7-8)
+  const baseMargin = isFemale ? 9 : 7;
 
-  // Base torso block (x: 8..39, y: 31..47)
+  // Base clothing body
   ctx.fillStyle = primary;
   for (let y = 31; y < size; y++) {
-    const margin = y < 35 ? Math.max(8, 38 - y) : 7;
+    const margin = y < 35 ? Math.max(baseMargin + 1, 38 - y) : baseMargin;
     ctx.fillRect(margin, y, size - margin * 2, 1);
   }
 
   // Shadow sides
   ctx.fillStyle = primaryDark;
   for (let y = 33; y < size; y++) {
-    ctx.fillRect(7, y, 2, 1);
-    ctx.fillRect(size - 9, y, 2, 1);
+    ctx.fillRect(baseMargin, y, 2, 1);
+    ctx.fillRect(size - baseMargin - 2, y, 2, 1);
   }
 
   // Shoulder highlight seam
   ctx.fillStyle = primaryLight;
-  ctx.fillRect(9, 32, 8, 1);
-  ctx.fillRect(size - 17, 32, 8, 1);
+  ctx.fillRect(baseMargin + 2, 32, 7, 1);
+  ctx.fillRect(size - baseMargin - 9, 32, 7, 1);
 
-  if (type === 'sweater_necklace' || traits.hasNecklace) {
-    // Ribbed knit collar
+  if (type === 'tshirt') {
+    // Crewneck or Scoopneck T-shirt
+    ctx.fillStyle = isFemale ? primaryDark : adjustBrightness(primary, -25);
+    ctx.fillRect(isFemale ? 18 : 19, 31, isFemale ? 12 : 10, isFemale ? 4 : 2);
+    // Neck opening showing skin
+    const skinTone = traits.skinTone || '#E0AA8B';
+    ctx.fillStyle = adjustBrightness(skinTone, -8);
+    ctx.fillRect(isFemale ? 19 : 20, 31, isFemale ? 10 : 8, isFemale ? 3 : 2);
+
+    // Collar trim
+    ctx.fillStyle = secondary || primaryLight;
+    ctx.fillRect(isFemale ? 18 : 19, 30, isFemale ? 12 : 10, 1);
+  } else if (type === 'sweater' || type === 'sweater_necklace' || traits.hasNecklace) {
+    // Ribbed knit sweater
     ctx.fillStyle = primaryDark;
     ctx.fillRect(17, 31, 14, 3);
     ctx.fillStyle = primaryLight;
@@ -222,49 +237,73 @@ function renderTorso(ctx: CanvasRenderingContext2D, traits: AvatarTraits, size: 
     }
 
     // Silver chain necklace
-    ctx.fillStyle = '#E5E7EB';
-    ctx.fillRect(20, 34, 1, 2);
-    ctx.fillRect(27, 34, 1, 2);
-    ctx.fillRect(21, 36, 1, 2);
-    ctx.fillRect(26, 36, 1, 2);
-    ctx.fillRect(22, 38, 2, 1);
-    ctx.fillRect(24, 38, 2, 1);
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(23, 39, 2, 2); // pendant
+    if (traits.hasNecklace || isFemale) {
+      ctx.fillStyle = '#E5E7EB';
+      ctx.fillRect(20, 34, 1, 2);
+      ctx.fillRect(27, 34, 1, 2);
+      ctx.fillRect(21, 36, 1, 2);
+      ctx.fillRect(26, 36, 1, 2);
+      ctx.fillRect(22, 38, 2, 1);
+      ctx.fillRect(24, 38, 2, 1);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(23, 39, 2, 2);
+    }
+  } else if (type === 'collared_shirt') {
+    // Formal / Casual Button-up collared shirt
+    ctx.fillStyle = primaryLight;
+    // Left collar flap
+    ctx.fillRect(17, 31, 4, 4);
+    ctx.fillRect(19, 35, 2, 1);
+    // Right collar flap
+    ctx.fillRect(27, 31, 4, 4);
+    ctx.fillRect(27, 35, 2, 1);
+    // Button placket
+    ctx.fillStyle = primaryDark;
+    ctx.fillRect(23, 34, 2, 13);
+    // White pearl buttons
+    ctx.fillStyle = '#F3F4F6';
+    ctx.fillRect(23, 36, 2, 1);
+    ctx.fillRect(23, 39, 2, 1);
+    ctx.fillRect(23, 42, 2, 1);
+    ctx.fillRect(23, 45, 2, 1);
+  } else if (type === 'tank_top') {
+    // Sleeveless top showing shoulders
+    const skinTone = traits.skinTone || '#E0AA8B';
+    ctx.fillStyle = skinTone;
+    // Exposed shoulders
+    ctx.fillRect(baseMargin, 31, 4, 4);
+    ctx.fillRect(size - baseMargin - 4, 31, 4, 4);
+    // Low scoop neck
+    ctx.fillRect(17, 31, 14, 5);
   } else if (type === 'zipper_polo') {
     // Collar flaps
     ctx.fillStyle = primaryLight;
     ctx.fillRect(18, 31, 4, 3);
     ctx.fillRect(26, 31, 4, 3);
-
-    // Center zipper line
+    // Center zipper
     ctx.fillStyle = '#9CA3AF';
     ctx.fillRect(23, 34, 2, 9);
-    // Silver zipper slider
     ctx.fillStyle = '#E5E7EB';
     ctx.fillRect(22, 36, 4, 3);
     ctx.fillStyle = '#1F2937';
-    ctx.fillRect(23, 37, 2, 1); // zipper hole
+    ctx.fillRect(23, 37, 2, 1);
   } else {
-    // Default: Hoodie with drawstrings
-    // Hood rim around neck
+    // Hoodie with drawstrings
     ctx.fillStyle = primaryDark;
     ctx.fillRect(16, 31, 5, 4);
     ctx.fillRect(27, 31, 5, 4);
 
-    // Left drawstring
+    // Drawstrings
     ctx.fillStyle = secondary;
     ctx.fillRect(20, 35, 1, 8);
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(20, 43, 1, 2); // aglet tip
+    ctx.fillRect(20, 43, 1, 2);
 
-    // Right drawstring
     ctx.fillStyle = secondary;
     ctx.fillRect(27, 35, 1, 8);
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(27, 43, 1, 2);
 
-    // Optional chest logo / swoosh
     if (traits.clothingDetail === 'swoosh' || traits.archetype === 'minecraft_scenic') {
       ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(19, 39, 4, 1);
@@ -278,18 +317,19 @@ function renderTorso(ctx: CanvasRenderingContext2D, traits: AvatarTraits, size: 
 }
 
 /**
- * Draws head, neck, ears, and skin shading
+ * Draws head, neck, face oval, and delicate feminine/masculine contours
  */
 function renderHead(ctx: CanvasRenderingContext2D, traits: AvatarTraits) {
-  const skin = traits.skinTone || '#E0AA8B';
+  const isFemale = Boolean(traits.isFemale || traits.gender === 'female');
+  const skin = traits.skinTone || (isFemale ? '#FCD0B4' : '#E0AA8B');
   const skinDark = traits.skinShade || adjustBrightness(skin, -16);
   const skinHighlight = traits.skinHighlight || adjustBrightness(skin, 12);
 
   // Neck
   ctx.fillStyle = skinDark;
-  ctx.fillRect(20, 25, 8, 4);
+  ctx.fillRect(isFemale ? 21 : 20, 25, isFemale ? 6 : 8, 4);
   ctx.fillStyle = skin;
-  ctx.fillRect(21, 27, 6, 5);
+  ctx.fillRect(isFemale ? 21 : 21, 27, isFemale ? 6 : 6, 5);
 
   // Face Oval
   ctx.fillStyle = skin;
@@ -302,8 +342,8 @@ function renderHead(ctx: CanvasRenderingContext2D, traits: AvatarTraits) {
       endX = 31;
     } else if (y >= 25) {
       const taper = y - 24;
-      startX = 14 + taper * 2;
-      endX = 33 - taper * 2;
+      startX = isFemale ? 15 + taper * 2 : 14 + taper * 2;
+      endX = isFemale ? 32 - taper * 2 : 33 - taper * 2;
     }
 
     ctx.fillRect(startX, y, endX - startX + 1, 1);
@@ -313,9 +353,9 @@ function renderHead(ctx: CanvasRenderingContext2D, traits: AvatarTraits) {
   ctx.fillStyle = skinHighlight;
   ctx.fillRect(20, 14, 8, 2);
 
-  // Cheek blush
-  if (traits.hasBlush) {
-    ctx.fillStyle = 'rgba(239, 68, 68, 0.35)';
+  // Rosy cheeks / blush (enhanced for females)
+  if (traits.hasBlush || isFemale) {
+    ctx.fillStyle = isFemale ? 'rgba(251, 113, 133, 0.45)' : 'rgba(239, 68, 68, 0.3)';
     ctx.fillRect(16, 22, 3, 2);
     ctx.fillRect(29, 22, 3, 2);
   }
@@ -326,7 +366,7 @@ function renderHead(ctx: CanvasRenderingContext2D, traits: AvatarTraits) {
   ctx.fillRect(34, 19, 2, 5);
 
   // Earrings
-  if (traits.hasEarrings) {
+  if (traits.hasEarrings || isFemale) {
     ctx.fillStyle = '#E5E7EB';
     ctx.fillRect(12, 24, 1, 2);
     ctx.fillRect(35, 24, 1, 2);
@@ -337,82 +377,106 @@ function renderHead(ctx: CanvasRenderingContext2D, traits: AvatarTraits) {
 }
 
 /**
- * Draws facial features: eyes, nose, mouth, facial hair
+ * Draws eyes, eyebrows, lips, and facial hair
  */
 function renderFeatures(ctx: CanvasRenderingContext2D, traits: AvatarTraits) {
+  const isFemale = Boolean(traits.isFemale || traits.gender === 'female');
   const eyeColor = traits.eyeColor || '#2B4A6F';
   const skinDark = traits.skinShade || adjustBrightness(traits.skinTone || '#E0AA8B', -16);
   const hairColor = traits.hairColor || '#3C2817';
   const beardColor = traits.beardColor || hairColor;
 
   // Eyebrows
-  ctx.fillStyle = adjustBrightness(hairColor, -10);
-  ctx.fillRect(16, 17, 5, 1);
-  ctx.fillRect(27, 17, 5, 1);
+  ctx.fillStyle = adjustBrightness(hairColor, -12);
+  if (isFemale) {
+    // Elegant arched feminine eyebrows
+    ctx.fillRect(16, 17, 4, 1);
+    ctx.fillRect(18, 16, 3, 1);
+    ctx.fillRect(27, 16, 3, 1);
+    ctx.fillRect(28, 17, 4, 1);
+  } else {
+    ctx.fillRect(16, 17, 5, 1);
+    ctx.fillRect(27, 17, 5, 1);
+  }
 
   // Nose contour
   ctx.fillStyle = skinDark;
   ctx.fillRect(23, 22, 2, 2);
 
   // Eyes
-  if (traits.eyeStyle === 'squinting_smile') {
-    // Relaxed squinting smile lines
+  if (!isFemale && traits.eyeStyle === 'squinting_smile') {
     ctx.fillStyle = '#26180E';
     ctx.fillRect(17, 20, 4, 1);
     ctx.fillRect(18, 19, 2, 1);
     ctx.fillRect(27, 20, 4, 1);
     ctx.fillRect(28, 19, 2, 1);
   } else {
-    // Full pixel eyes with highlights
-    // Left eye (x: 17..20, y: 19..21)
+    // Left eye (x: 16..21, y: 18..21)
+    if (isFemale) {
+      // Feminine anime eye with winged eyelash flick!
+      ctx.fillStyle = '#0F172A';
+      ctx.fillRect(16, 18, 5, 1);
+      ctx.fillRect(15, 18, 1, 1); // outer lash flick!
+    } else {
+      ctx.fillStyle = '#1E293B';
+      ctx.fillRect(16, 18, 5, 1);
+    }
+    // Sclera whites
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(16, 19, 5, 3);
+    // Iris
     ctx.fillStyle = eyeColor;
     ctx.fillRect(18, 19, 2, 3);
-    ctx.fillStyle = '#111827';
-    ctx.fillRect(18, 20, 2, 1); // pupil
+    // Pupil
+    ctx.fillStyle = '#090D16';
+    ctx.fillRect(18, 20, 2, 1);
+    // Specular catchlight highlight
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(18, 19, 1, 1); // specular catchlight
+    ctx.fillRect(18, 19, 1, 1);
 
-    // Right eye (x: 27..30, y: 19..21)
+    // Right eye (x: 27..32, y: 18..21)
+    if (isFemale) {
+      ctx.fillStyle = '#0F172A';
+      ctx.fillRect(27, 18, 5, 1);
+      ctx.fillRect(32, 18, 1, 1); // outer lash flick!
+    } else {
+      ctx.fillStyle = '#1E293B';
+      ctx.fillRect(27, 18, 5, 1);
+    }
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(27, 19, 5, 3);
     ctx.fillStyle = eyeColor;
     ctx.fillRect(28, 19, 2, 3);
-    ctx.fillStyle = '#111827';
-    ctx.fillRect(28, 20, 2, 1); // pupil
+    ctx.fillStyle = '#090D16';
+    ctx.fillRect(28, 20, 2, 1);
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(28, 19, 1, 1); // specular catchlight
+    ctx.fillRect(28, 19, 1, 1);
   }
 
-  // Mouth
-  if (traits.expression === 'cute_smirk' || traits.archetype === 'anime_pixel') {
-    // Pink cute lips with bottom shine
+  // Lips / Mouth
+  if (isFemale) {
+    // Beautiful soft pink/rose anime lips with gloss shine
     ctx.fillStyle = '#F472B6';
     ctx.fillRect(22, 25, 4, 1);
     ctx.fillStyle = '#EC4899';
     ctx.fillRect(22, 26, 4, 1);
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(24, 26, 1, 1);
+    ctx.fillRect(24, 26, 1, 1); // gloss reflection
   } else if (traits.expression === 'smile' || traits.expression === 'grin') {
-    // Warm friendly smile
     ctx.fillStyle = '#991B1B';
     ctx.fillRect(21, 25, 6, 2);
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(22, 25, 4, 1); // teeth
+    ctx.fillRect(22, 25, 4, 1);
   } else {
-    // Clean calm mouth line
     ctx.fillStyle = '#4A2810';
     ctx.fillRect(22, 25, 4, 1);
   }
 
-  // Facial Hair
-  if (traits.hasFacialHair || traits.hasBeard) {
+  // Facial Hair (males only)
+  if (!isFemale && (traits.hasFacialHair || traits.hasBeard)) {
     ctx.fillStyle = beardColor;
-    // Mustache
     ctx.fillRect(20, 23, 8, 2);
     ctx.fillRect(21, 22, 6, 1);
-    // Beard along chin
     ctx.fillRect(16, 25, 3, 2);
     ctx.fillRect(29, 25, 3, 2);
     ctx.fillRect(18, 26, 12, 2);
@@ -427,45 +491,37 @@ function renderGlasses(ctx: CanvasRenderingContext2D, traits: AvatarTraits) {
   if (!traits.hasGlasses) return;
 
   const gColor = traits.glassesColor || '#161D26';
-  const gStyle = traits.glassesStyle || 'round_wire';
+  const gStyle = traits.glassesStyle || (traits.isFemale ? 'round_wire' : 'thick_rectangular');
 
   ctx.fillStyle = gColor;
 
   if (gStyle === 'thick_rectangular') {
-    // Bold rectangular frames
-    // Left rim
     ctx.fillRect(15, 18, 7, 1);
     ctx.fillRect(15, 22, 7, 1);
     ctx.fillRect(15, 19, 1, 3);
     ctx.fillRect(21, 19, 1, 3);
-    // Right rim
+
     ctx.fillRect(26, 18, 7, 1);
     ctx.fillRect(26, 22, 7, 1);
     ctx.fillRect(26, 19, 1, 3);
     ctx.fillRect(32, 19, 1, 3);
-    // Bridge
+
     ctx.fillRect(22, 19, 4, 1);
-    // Temples to ears
     ctx.fillRect(13, 19, 2, 1);
     ctx.fillRect(33, 19, 2, 1);
   } else {
-    // Round wireframe glasses (like Inspo 1, 4, 5)
-    // Left circle
+    // Round wireframe glasses (Inspo 1, 4, 5)
     ctx.fillRect(16, 17, 5, 1);
     ctx.fillRect(16, 23, 5, 1);
     ctx.fillRect(15, 18, 1, 5);
     ctx.fillRect(21, 18, 1, 5);
 
-    // Right circle
     ctx.fillRect(27, 17, 5, 1);
     ctx.fillRect(27, 23, 5, 1);
     ctx.fillRect(26, 18, 1, 5);
     ctx.fillRect(32, 18, 1, 5);
 
-    // Nose bridge
     ctx.fillRect(22, 19, 4, 1);
-
-    // Temples
     ctx.fillRect(13, 19, 2, 1);
     ctx.fillRect(33, 19, 2, 1);
 
@@ -477,16 +533,78 @@ function renderGlasses(ctx: CanvasRenderingContext2D, traits: AvatarTraits) {
 }
 
 /**
- * Draws hairstyle matching the inspiration references
+ * Draws authentic female and male hairstyles
  */
 function renderHair(ctx: CanvasRenderingContext2D, traits: AvatarTraits) {
-  const hair = traits.hairColor || '#3C2817';
+  const isFemale = Boolean(traits.isFemale || traits.gender === 'female');
+  const hair = traits.hairColor || '#2C1B10';
   const hairLight = traits.hairHighlight || adjustBrightness(hair, 18);
   const hairDark = traits.hairShadow || adjustBrightness(hair, -18);
-  const style = traits.hairStyle || 'curly_volume';
+  const style = traits.hairStyle || (isFemale ? 'long_straight' : 'curly_volume');
 
-  if (style === 'messy_bun_clip' || traits.archetype === 'anime_pixel') {
-    // Top Bun (Image 1)
+  if (style === 'long_straight') {
+    // Long straight hair cascading down BOTH shoulders past the chest (FEMALE)
+    ctx.fillStyle = hair;
+    // Top volume
+    ctx.fillRect(13, 5, 22, 9);
+    ctx.fillRect(11, 9, 26, 10);
+    // Parting and bangs
+    ctx.fillRect(15, 11, 18, 4);
+
+    // Left cascade down shoulder
+    ctx.fillRect(10, 14, 5, 28);
+    ctx.fillRect(11, 42, 3, 2);
+    // Right cascade down shoulder
+    ctx.fillRect(33, 14, 5, 28);
+    ctx.fillRect(34, 42, 3, 2);
+
+    // Highlight strands
+    ctx.fillStyle = hairLight;
+    ctx.fillRect(16, 7, 16, 2);
+    ctx.fillRect(11, 18, 1, 20);
+    ctx.fillRect(36, 18, 1, 20);
+
+    // Shadow depth
+    ctx.fillStyle = hairDark;
+    ctx.fillRect(14, 19, 1, 22);
+    ctx.fillRect(33, 19, 1, 22);
+  } else if (style === 'long_wavy') {
+    // Flowing long wavy hair cascading down shoulders
+    ctx.fillStyle = hair;
+    ctx.fillRect(12, 4, 24, 10);
+    ctx.fillRect(10, 8, 28, 12);
+
+    // Cascading waves left
+    for (let y = 14; y <= 42; y += 4) {
+      ctx.fillRect(9, y, 6, 3);
+      ctx.fillRect(10, y + 2, 5, 2);
+    }
+    // Cascading waves right
+    for (let y = 14; y <= 42; y += 4) {
+      ctx.fillRect(33, y, 6, 3);
+      ctx.fillRect(33, y + 2, 5, 2);
+    }
+
+    ctx.fillStyle = hairLight;
+    ctx.fillRect(15, 6, 18, 2);
+  } else if (style === 'ponytail') {
+    // High sleek ponytail with bangs
+    ctx.fillStyle = hair;
+    ctx.fillRect(13, 5, 22, 9);
+    ctx.fillRect(12, 10, 24, 6);
+    // Bangs
+    ctx.fillRect(16, 12, 16, 3);
+    // High ponytail swooping to the side
+    ctx.fillRect(32, 6, 7, 15);
+    ctx.fillRect(35, 18, 5, 8);
+    // Hair tie
+    ctx.fillStyle = '#EC4899';
+    ctx.fillRect(32, 6, 2, 3);
+    // Highlight
+    ctx.fillStyle = hairLight;
+    ctx.fillRect(16, 7, 15, 2);
+  } else if (style === 'messy_bun_clip') {
+    // Top Bun (Inspo 1)
     ctx.fillStyle = hair;
     ctx.fillRect(19, 4, 10, 7);
     ctx.fillRect(17, 6, 14, 5);
@@ -504,94 +622,78 @@ function renderHair(ctx: CanvasRenderingContext2D, traits: AvatarTraits) {
     ctx.fillStyle = hair;
     ctx.fillRect(13, 12, 4, 15);
     ctx.fillRect(31, 12, 4, 15);
-    // Loose pointed tip strands
     ctx.fillRect(14, 27, 2, 2);
     ctx.fillRect(32, 27, 2, 2);
-
-    // Hairline
     ctx.fillRect(16, 10, 16, 4);
 
     // Hair Clip
-    if (traits.hasHairClip !== false) {
-      ctx.fillStyle = '#111827';
-      ctx.fillRect(31, 13, 4, 1);
-      ctx.fillRect(32, 15, 3, 1);
-    }
-  } else if (style === 'bob_straight_bangs' || traits.archetype === 'aesthetic_bob') {
-    // Sleek Bob with straight bangs (Image 5)
+    ctx.fillStyle = '#111827';
+    ctx.fillRect(31, 13, 4, 1);
+    ctx.fillRect(32, 15, 3, 1);
+  } else if (style === 'bob_straight_bangs') {
+    // Sleek Bob with straight bangs (Inspo 5)
     ctx.fillStyle = hair;
-    // Top dome
     ctx.fillRect(13, 5, 22, 8);
     ctx.fillRect(11, 10, 26, 16);
     // Straight fringe bangs across forehead
     ctx.fillRect(16, 13, 16, 4);
-    // Textured bang cuts
     ctx.fillStyle = hairDark;
     ctx.fillRect(19, 16, 1, 2);
     ctx.fillRect(24, 16, 1, 2);
     ctx.fillRect(28, 16, 1, 2);
-
-    // Top shine band
     ctx.fillStyle = hairLight;
     ctx.fillRect(15, 7, 18, 2);
-
-    // Bob ends framing chin
     ctx.fillStyle = hairDark;
     ctx.fillRect(11, 23, 4, 4);
     ctx.fillRect(33, 23, 4, 4);
   } else if (style === 'messy_anime_layers') {
-    // Layered anime bangs (Image 4)
+    // Layered anime bangs (Inspo 4)
     ctx.fillStyle = hair;
     ctx.fillRect(12, 4, 24, 10);
     ctx.fillRect(10, 10, 28, 12);
-
-    // Center part strands falling over forehead
     ctx.fillRect(17, 12, 5, 5);
     ctx.fillRect(26, 12, 5, 5);
     ctx.fillRect(22, 10, 4, 3);
-
-    // Highlights
     ctx.fillStyle = hairLight;
     ctx.fillRect(14, 6, 20, 2);
     ctx.fillRect(18, 13, 2, 3);
-  } else if (style === 'minecraft_wavy' || traits.archetype === 'minecraft_scenic') {
-    // Textured wavy layered hair (Image 2)
+  } else if (style === 'minecraft_wavy') {
+    // Textured wavy layered hair (Inspo 2)
     ctx.fillStyle = hair;
     ctx.fillRect(13, 6, 22, 8);
-    // Jagged bangs
     ctx.fillRect(14, 12, 4, 3);
     ctx.fillRect(19, 12, 5, 4);
     ctx.fillRect(25, 12, 4, 4);
     ctx.fillRect(30, 12, 4, 3);
-
-    // Sideburns
     ctx.fillRect(12, 14, 3, 7);
     ctx.fillRect(33, 14, 3, 7);
-
-    // Shading chunks
     ctx.fillStyle = hairLight;
     ctx.fillRect(15, 7, 7, 2);
     ctx.fillRect(25, 7, 7, 2);
     ctx.fillStyle = hairDark;
     ctx.fillRect(14, 10, 20, 2);
+  } else if (style === 'short_crop_fade' || style === 'buzzcut') {
+    // Clean modern short crop / fade
+    ctx.fillStyle = hair;
+    ctx.fillRect(14, 6, 20, 7);
+    ctx.fillRect(15, 12, 18, 3);
+    ctx.fillStyle = hairDark;
+    ctx.fillRect(13, 12, 2, 6);
+    ctx.fillRect(33, 12, 2, 6);
+    ctx.fillStyle = hairLight;
+    ctx.fillRect(16, 7, 16, 2);
   } else {
-    // Voluminous curly hair (Image 3)
+    // Voluminous curly hair (Inspo 3)
     ctx.fillStyle = hair;
     ctx.fillRect(12, 4, 24, 11);
     ctx.fillRect(10, 8, 28, 11);
-
-    // Rounded curl bumps on top
     ctx.fillRect(14, 2, 5, 3);
     ctx.fillRect(21, 2, 6, 3);
     ctx.fillRect(29, 2, 5, 3);
-
-    // Curly forehead fringe
     ctx.fillRect(14, 13, 4, 3);
     ctx.fillRect(19, 13, 5, 4);
     ctx.fillRect(25, 13, 5, 4);
     ctx.fillRect(31, 13, 3, 3);
-
-    // Highlights on curl tops
     ctx.fillStyle = hairLight;
     ctx.fillRect(15, 3, 3, 1);
     ctx.fillRect(23, 3, 3, 1);
@@ -618,7 +720,6 @@ export function generateRetroPixelAvatar(
   const ctx = canvas.getContext('2d');
   if (!ctx) return '';
 
-  // Disable smoothing for authentic pixel art
   ctx.imageSmoothingEnabled = false;
 
   // 1. Background
