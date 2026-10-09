@@ -8,136 +8,116 @@ interface AvatarCardProps {
   className?: string;
 }
 
+// 9x9 Grid layout of purple microchip blocks surrounding the center 5x5 image
+const CHIP_BLOCKS = [
+  // Top teeth (row 0)
+  { r: 0, c: 2 }, { r: 0, c: 4 }, { r: 0, c: 6 },
+  // Top base row (row 1)
+  { r: 1, c: 2 }, { r: 1, c: 3 }, { r: 1, c: 4 }, { r: 1, c: 5 }, { r: 1, c: 6 },
+
+  // Left teeth (col 0)
+  { r: 2, c: 0 }, { r: 4, c: 0 }, { r: 6, c: 0 },
+  // Left base col (col 1)
+  { r: 2, c: 1 }, { r: 3, c: 1 }, { r: 4, c: 1 }, { r: 5, c: 1 }, { r: 6, c: 1 },
+
+  // Right base col (col 7)
+  { r: 2, c: 7 }, { r: 3, c: 7 }, { r: 4, c: 7 }, { r: 5, c: 7 }, { r: 6, c: 7 },
+  // Right teeth (col 8)
+  { r: 2, c: 8 }, { r: 4, c: 8 }, { r: 6, c: 8 },
+
+  // Bottom base row (row 7)
+  { r: 7, c: 2 }, { r: 7, c: 3 }, { r: 7, c: 4 }, { r: 7, c: 5 }, { r: 7, c: 6 },
+  // Bottom teeth (row 8)
+  { r: 8, c: 2 }, { r: 8, c: 4 }, { r: 8, c: 6 },
+];
+
 export const AvatarCard: React.FC<AvatarCardProps> = ({
   playerName,
   avatarDataUrl,
   stats,
   className = '',
 }) => {
-  const displayName = (playerName.trim() || 'PIXEL PLAYER').toUpperCase();
+  const displayName = playerName.trim() || 'Name';
 
   return (
     <div
-      className={`relative w-full max-w-[432px] aspect-[3/4] bg-[#161D26] rounded-lg p-6 sm:p-7 flex flex-col items-center justify-between border-2 border-[#362F4B] shadow-2xl select-none overflow-hidden ${className}`}
+      className={`relative w-full max-w-[420px] bg-[#141A23] rounded-sm p-6 sm:p-7 flex flex-col items-center justify-between border border-[#273244] shadow-2xl select-none overflow-hidden ${className}`}
       style={{
         backgroundImage:
-          'linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px)',
-        backgroundSize: '24px 24px',
+          'linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px)',
+        backgroundSize: '36px 36px',
+        backgroundPosition: 'center',
       }}
     >
-      {/* 1. Top Heading: Bold Purple Pixel Font */}
-      <div className="w-full text-center pt-2">
-        <h2 className="font-pixel text-base sm:text-lg font-bold tracking-wider text-[#A855F7] drop-shadow-[0_2px_4px_rgba(76,29,149,0.8)] truncate px-2">
+      {/* 1. Top Heading: Centered Pixel Name */}
+      <div className="w-full text-center pt-1 pb-4">
+        <h2 className="font-pixel text-lg sm:text-xl font-bold tracking-wider text-[#A855F7] truncate drop-shadow-[0_2px_4px_rgba(168,85,247,0.4)]">
           {displayName}
         </h2>
       </div>
 
-      {/* 2. Central Avatar with Thick Geometric Stepped Pixel Purple Border */}
-      <div className="relative my-auto flex items-center justify-center p-3">
-        {/* SVG Geometric Stepped Pixel Frame with Rectangular Protrusions (Top, Bottom, Sides) */}
-        <div className="relative w-52 h-52 sm:w-60 sm:h-60 flex items-center justify-center">
+      {/* 2. Center Chip Frame with Microchip Teeth & Pixelated Avatar */}
+      <div className="relative my-auto flex items-center justify-center">
+        <div className="relative w-[288px] h-[288px] sm:w-[324px] sm:h-[324px]">
+          {/* Purple block SVG frame */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none z-10"
-            viewBox="0 0 240 240"
+            viewBox="0 0 324 324"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            {/* Outer Deep Purple Contour */}
-            {/* Main Outer Box */}
-            <rect x="16" y="16" width="208" height="208" fill="#6B21A8" stroke="#4C1D95" strokeWidth="4" />
-            
-            {/* Rectangular Protrusions: Top, Bottom, Left, Right Tabs */}
-            {/* Top Tab */}
-            <rect x="75" y="6" width="90" height="14" fill="#6B21A8" stroke="#4C1D95" strokeWidth="3" />
-            <rect x="85" y="9" width="70" height="4" fill="#C084FC" />
-
-            {/* Bottom Tab */}
-            <rect x="75" y="220" width="90" height="14" fill="#6B21A8" stroke="#4C1D95" strokeWidth="3" />
-            <rect x="85" y="227" width="70" height="4" fill="#C084FC" />
-
-            {/* Left Tab */}
-            <rect x="6" y="75" width="14" height="90" fill="#6B21A8" stroke="#4C1D95" strokeWidth="3" />
-            <rect x="9" y="85" width="4" height="70" fill="#C084FC" />
-
-            {/* Right Tab */}
-            <rect x="220" y="75" width="14" height="90" fill="#6B21A8" stroke="#4C1D95" strokeWidth="3" />
-            <rect x="227" y="85" width="4" height="70" fill="#C084FC" />
-
-            {/* Stepped Pixel Corners: Notches */}
-            <rect x="16" y="16" width="16" height="16" fill="#161D26" />
-            <rect x="208" y="16" width="16" height="16" fill="#161D26" />
-            <rect x="16" y="208" width="16" height="16" fill="#161D26" />
-            <rect x="208" y="208" width="16" height="16" fill="#161D26" />
-
-            {/* Inner Purple Inset Border (#A855F7) */}
-            <rect x="24" y="24" width="192" height="192" stroke="#A855F7" strokeWidth="6" />
-            <rect x="28" y="28" width="184" height="184" stroke="#3B0764" strokeWidth="2" />
+            {CHIP_BLOCKS.map(({ r, c }, idx) => (
+              <rect
+                key={idx}
+                x={c * 36}
+                y={r * 36}
+                width={36}
+                height={36}
+                fill="#A855F7"
+                stroke="#141A23"
+                strokeWidth={1.5}
+              />
+            ))}
           </svg>
 
-          {/* Avatar Image in Center Cutout */}
-          <div className="relative w-44 h-44 sm:w-52 sm:h-52 bg-[#161D26] overflow-hidden rounded-xs z-0">
+          {/* Centered Photo Cutout (Spanning 5x5 blocks: x=72..252, y=72..252) */}
+          <div
+            className="absolute overflow-hidden z-0"
+            style={{
+              left: '22.222%',
+              top: '22.222%',
+              width: '55.556%',
+              height: '55.556%',
+            }}
+          >
             <img
               src={avatarDataUrl}
-              alt="8-bit Minecraft Character Avatar"
+              alt="8-bit Character Avatar"
               className="w-full h-full object-cover pixelated"
             />
           </div>
         </div>
       </div>
 
-      {/* 3. Stats Section: 4 Stat Labels Below Avatar in Compact Two-Column Layout */}
-      <div className="w-full grid grid-cols-2 gap-2 sm:gap-3 px-1 my-1">
+      {/* 3. Stats Section: Raw Purple Pixel Text in Two Columns */}
+      <div className="w-full max-w-[340px] px-2 pt-6 pb-4 flex justify-between items-center text-[#A855F7] font-pixel text-[9px] sm:text-[10px] leading-relaxed">
         {/* Left Column */}
-        <div className="flex flex-col gap-1.5 sm:gap-2">
-          <div className="p-1.5 sm:p-2 rounded bg-[#A855F7]/10 border border-[#4C1D95] text-left">
-            <span className="block font-pixel text-[9px] sm:text-[10px] text-[#C084FC] tracking-wider leading-tight">
-              Rizz Level -
-            </span>
-            <span className="block font-pixel text-[10px] sm:text-[11px] text-[#F5F3FF] font-bold mt-1">
-              {stats.rizzLevel || '10/10'}
-            </span>
-          </div>
-
-          <div className="p-1.5 sm:p-2 rounded bg-[#A855F7]/10 border border-[#4C1D95] text-left">
-            <span className="block font-pixel text-[9px] sm:text-[10px] text-[#C084FC] tracking-wider leading-tight">
-              Flag Status -
-            </span>
-            <span className="block font-pixel text-[10px] sm:text-[11px] text-[#F5F3FF] font-bold mt-1">
-              {stats.flagStatus || 'Green?'}
-            </span>
-          </div>
+        <div className="flex flex-col gap-2 text-left">
+          <div>Rizz Level - {stats.rizzLevel || '10/10'}</div>
+          <div>Flag Status - {stats.flagStatus || 'Green?'}</div>
         </div>
 
         {/* Right Column */}
-        <div className="flex flex-col gap-1.5 sm:gap-2">
-          <div className="p-1.5 sm:p-2 rounded bg-[#A855F7]/10 border border-[#4C1D95] text-left">
-            <span className="block font-pixel text-[9px] sm:text-[10px] text-[#C084FC] tracking-wider leading-tight">
-              Aura Points -
-            </span>
-            <span className="block font-pixel text-[10px] sm:text-[11px] text-[#F5F3FF] font-bold mt-1">
-              {stats.auraPoints || '1000+'}
-            </span>
-          </div>
-
-          <div className="p-1.5 sm:p-2 rounded bg-[#A855F7]/10 border border-[#4C1D95] text-left">
-            <span className="block font-pixel text-[9px] sm:text-[10px] text-[#C084FC] tracking-wider leading-tight">
-              Social Battery -
-            </span>
-            <span className="block font-pixel text-[10px] sm:text-[11px] text-[#F5F3FF] font-bold mt-1">
-              {stats.socialBattery || 'LOW'}
-            </span>
-          </div>
+        <div className="flex flex-col gap-2 text-left">
+          <div>Aura Points - {stats.auraPoints || '1000+'}</div>
+          <div>Social Battery - {stats.socialBattery || 'LOW'}</div>
         </div>
       </div>
 
       {/* 4. Footer: AWSnap by AWS SBG NMIET */}
-      <div className="w-full text-center pb-2 pt-1">
-        <span className="font-pixel text-base sm:text-lg font-bold text-[#A855F7] tracking-wider">
-          AWSnap
-        </span>
-        <span className="block text-[11px] sm:text-xs text-[#B8AECF] font-semibold tracking-wide mt-0.5">
-          by AWS SBG NMIET
-        </span>
+      <div className="w-full text-center pt-2 pb-1 font-pixel text-[#A855F7]">
+        <span className="text-sm sm:text-base font-bold tracking-wider">AWSnap</span>{' '}
+        <span className="text-[10px] sm:text-xs tracking-wide text-[#A855F7]">by AWS SBG NMIET</span>
       </div>
     </div>
   );

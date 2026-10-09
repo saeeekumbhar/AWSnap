@@ -17,74 +17,49 @@ export interface CardData {
   stats: CardStats;
 }
 
+// 9x9 Grid layout of purple microchip blocks surrounding the center 5x5 image
+const CHIP_BLOCKS = [
+  // Top teeth (row 0)
+  { r: 0, c: 2 }, { r: 0, c: 4 }, { r: 0, c: 6 },
+  // Top base row (row 1)
+  { r: 1, c: 2 }, { r: 1, c: 3 }, { r: 1, c: 4 }, { r: 1, c: 5 }, { r: 1, c: 6 },
+
+  // Left teeth (col 0)
+  { r: 2, c: 0 }, { r: 4, c: 0 }, { r: 6, c: 0 },
+  // Left base col (col 1)
+  { r: 2, c: 1 }, { r: 3, c: 1 }, { r: 4, c: 1 }, { r: 5, c: 1 }, { r: 6, c: 1 },
+
+  // Right base col (col 7)
+  { r: 2, c: 7 }, { r: 3, c: 7 }, { r: 4, c: 7 }, { r: 5, c: 7 }, { r: 6, c: 7 },
+  // Right teeth (col 8)
+  { r: 2, c: 8 }, { r: 4, c: 8 }, { r: 6, c: 8 },
+
+  // Bottom base row (row 7)
+  { r: 7, c: 2 }, { r: 7, c: 3 }, { r: 7, c: 4 }, { r: 7, c: 5 }, { r: 7, c: 6 },
+  // Bottom teeth (row 8)
+  { r: 8, c: 2 }, { r: 8, c: 4 }, { r: 8, c: 6 },
+];
+
 /**
- * Draws the geometric stepped pixel border with rectangular protrusions
- * at top, bottom, and sides.
+ * Draws the microchip pixel frame with 3 teeth on each side
  */
-function drawSteppedPixelFrame(
+function drawChipPixelFrame(
   ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  innerSize: number
+  originX: number,
+  originY: number,
+  blockSize: number
 ) {
   ctx.save();
-  const half = innerSize / 2;
-  const borderWidth = 18;
-  const tabThickness = 16;
-  const tabWidth = innerSize * 0.38;
-
-  // Outer boundary
-  const ox = cx - half - borderWidth;
-  const oy = cy - half - borderWidth;
-  const ow = innerSize + borderWidth * 2;
-  const oh = innerSize + borderWidth * 2;
-
-  // 1. Draw outer stepped shadow layer (Deep Purple #4A154B / #581C87)
-  ctx.fillStyle = '#4C1D95';
-  ctx.fillRect(ox - 4, oy - 4, ow + 8, oh + 8);
-
-  // Protrusions in shadow
-  ctx.fillRect(cx - tabWidth / 2 - 4, oy - tabThickness - 4, tabWidth + 8, tabThickness + 6); // Top tab
-  ctx.fillRect(cx - tabWidth / 2 - 4, oy + oh - 2, tabWidth + 8, tabThickness + 6); // Bottom tab
-  ctx.fillRect(ox - tabThickness - 4, cy - tabWidth / 2 - 4, tabThickness + 6, tabWidth + 8); // Left tab
-  ctx.fillRect(ox + ow - 2, cy - tabWidth / 2 - 4, tabThickness + 6, tabWidth + 8); // Right tab
-
-  // 2. Main Outer Purple Frame (#7E22CE / #6B21A8)
-  ctx.fillStyle = '#6B21A8';
-  ctx.fillRect(ox, oy, ow, oh);
-
-  // Main protrusions (#6B21A8)
-  ctx.fillRect(cx - tabWidth / 2, oy - tabThickness, tabWidth, tabThickness + 2);
-  ctx.fillRect(cx - tabWidth / 2, oy + oh - 2, tabWidth, tabThickness + 2);
-  ctx.fillRect(ox - tabThickness, cy - tabWidth / 2, tabThickness + 2, tabWidth);
-  ctx.fillRect(ox + ow - 2, cy - tabWidth / 2, tabThickness + 2, tabWidth);
-
-  // 3. Highlight Stepped Pixel Inset (#A855F7 and #C084FC)
-  const step = 8;
   ctx.fillStyle = '#A855F7';
-  // Outer border highlights
-  ctx.fillRect(ox + step, oy + step, ow - step * 2, oh - step * 2);
+  ctx.strokeStyle = '#141A23';
+  ctx.lineWidth = 2;
 
-  // Stepped corner notches (pixel art stepped teeth at 4 corners)
-  const cornerSize = 24;
-  ctx.fillStyle = '#4C1D95';
-  ctx.fillRect(ox, oy, cornerSize, cornerSize);
-  ctx.fillRect(ox + ow - cornerSize, oy, cornerSize, cornerSize);
-  ctx.fillRect(ox, oy + oh - cornerSize, cornerSize, cornerSize);
-  ctx.fillRect(ox + ow - cornerSize, oy + oh - cornerSize, cornerSize, cornerSize);
-
-  // Secondary stepped pixel teeth
-  ctx.fillStyle = '#C084FC';
-  // Top & bottom center tab accents
-  ctx.fillRect(cx - tabWidth / 2 + 12, oy - tabThickness + 4, tabWidth - 24, 6);
-  ctx.fillRect(cx - tabWidth / 2 + 12, oy + oh + tabThickness - 10, tabWidth - 24, 6);
-  // Left & right center tab accents
-  ctx.fillRect(ox - tabThickness + 4, cy - tabWidth / 2 + 12, 6, tabWidth - 24);
-  ctx.fillRect(ox + ow + tabThickness - 10, cy - tabWidth / 2 + 12, 6, tabWidth - 24);
-
-  // Inner frame bevel
-  ctx.fillStyle = '#3B0764';
-  ctx.fillRect(cx - half - 4, cy - half - 4, innerSize + 8, innerSize + 8);
+  for (const { r, c } of CHIP_BLOCKS) {
+    const x = originX + c * blockSize;
+    const y = originY + r * blockSize;
+    ctx.fillRect(x, y, blockSize, blockSize);
+    ctx.strokeRect(x, y, blockSize, blockSize);
+  }
 
   ctx.restore();
 }
@@ -103,60 +78,62 @@ export async function composeCardToCanvas(
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas 2D context unavailable');
 
-  // 1. Mandatory Background: Flat #161D26 (NO GRADIENTS)
-  ctx.fillStyle = '#161D26';
+  // 1. Card Background: Flat #141A23
+  ctx.fillStyle = '#141A23';
   ctx.fillRect(0, 0, width, height);
 
-  // 2. Subtle technical fine-line grid across the card
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
+  // 2. Technical fine-line grid across the card matching block grid
+  const blockSize = 68;
+  const chipOriginX = Math.round((width - 9 * blockSize) / 2); // 144
+  const chipOriginY = 200;
+
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
   ctx.lineWidth = 1.5;
-  const gridSize = 32;
 
   ctx.beginPath();
-  for (let x = 0; x <= width; x += gridSize) {
+  // Align grid lines with the chip blocks
+  for (let x = chipOriginX % blockSize; x <= width; x += blockSize) {
     ctx.moveTo(x, 0);
     ctx.lineTo(x, height);
   }
-  for (let y = 0; y <= height; y += gridSize) {
+  for (let y = chipOriginY % blockSize; y <= height; y += blockSize) {
     ctx.moveTo(0, y);
     ctx.lineTo(width, y);
   }
   ctx.stroke();
 
   // Subtle card border
-  ctx.strokeStyle = '#362F4B';
+  ctx.strokeStyle = '#273244';
   ctx.lineWidth = 3;
-  ctx.strokeRect(12, 12, width - 24, height - 24);
+  ctx.strokeRect(10, 10, width - 20, height - 20);
 
   // Ensure fonts are loaded
   try {
     await document.fonts.load('bold 36px "Press Start 2P"');
+    await document.fonts.load('28px "Press Start 2P"');
     await document.fonts.load('20px "Press Start 2P"');
+    await document.fonts.load('16px "Press Start 2P"');
   } catch (e) {
     console.warn('Font loading fallback used');
   }
 
-  // 3. Top Heading: Chosen Player Name in Bold Purple Pixel Font
-  const displayName = (data.playerName.trim() || 'PIXEL PLAYER').toUpperCase();
+  // 3. Top Heading: Chosen Player Name in Centered Purple Pixel Font
+  const displayName = data.playerName.trim() || 'Name';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  
-  // Outer text shadow for retro pop
   ctx.font = 'bold 36px "Press Start 2P", monospace';
-  ctx.fillStyle = '#4C1D95';
-  ctx.fillText(displayName, width / 2 + 3, 110 + 3);
-
   ctx.fillStyle = '#A855F7';
-  ctx.fillText(displayName, width / 2, 110);
+  ctx.fillText(displayName, width / 2, 115);
 
-  // 4. Central Avatar & Purple Stepped Pixel Border
-  const avatarCenterY = 475;
-  const avatarSize = 480;
+  // 4. Central Avatar & Purple Microchip Pixel Border
+  // Draw purple chip blocks
+  drawChipPixelFrame(ctx, chipOriginX, chipOriginY, blockSize);
 
-  // Draw stepped geometric purple frame
-  drawSteppedPixelFrame(ctx, width / 2, avatarCenterY, avatarSize);
+  // Draw Avatar Image inside the central 5x5 cutout
+  const photoX = chipOriginX + 2 * blockSize;
+  const photoY = chipOriginY + 2 * blockSize;
+  const photoSize = 5 * blockSize; // 340px
 
-  // Draw Avatar Image inside the central cutout
   const avatarImg = new Image();
   avatarImg.crossOrigin = 'anonymous';
   await new Promise<void>((resolve, reject) => {
@@ -166,31 +143,20 @@ export async function composeCardToCanvas(
   });
 
   ctx.save();
-  // Pixelated rendering to guarantee crisp square pixel clusters
   ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(
-    avatarImg,
-    width / 2 - avatarSize / 2,
-    avatarCenterY - avatarSize / 2,
-    avatarSize,
-    avatarSize
-  );
+  ctx.drawImage(avatarImg, photoX, photoY, photoSize, photoSize);
   ctx.restore();
 
-  // 5. Four Stats Section below Avatar in a Compact Two-Column Layout
-  // Left column:
-  // - Rizz Level — 10/10
-  // - Flag Status — Green?
-  // Right column:
-  // - Aura Points — 1000+
-  // - Social Battery — LOW
-  const statsTopY = 820;
-  const leftColX = 140;
-  const rightColX = 520;
-  const lineSpacing = 70;
+  // 5. Four Stats Section below Avatar in Two Columns (Pure Pixel Text)
+  const statsTopY = 880;
+  const leftColX = chipOriginX;
+  const rightColX = chipOriginX + 5 * blockSize + 20;
+  const lineSpacing = 50;
 
-  ctx.font = '18px "Press Start 2P", monospace';
+  ctx.font = '16px "Press Start 2P", monospace';
   ctx.textBaseline = 'top';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#A855F7';
 
   const stats = data.stats || {
     rizzLevel: '10/10',
@@ -199,48 +165,35 @@ export async function composeCardToCanvas(
     socialBattery: 'LOW',
   };
 
-  // Helper to draw a stat entry with retro purple palette
-  const drawStat = (label: string, value: string, x: number, y: number) => {
-    // Stat background bar
-    ctx.fillStyle = 'rgba(168, 85, 247, 0.08)';
-    ctx.fillRect(x - 14, y - 8, 320, 48);
-    ctx.strokeStyle = '#4C1D95';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(x - 14, y - 8, 320, 48);
-
-    // Label text
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#C084FC';
-    ctx.fillText(`${label} -`, x, y);
-
-    // Value text
-    ctx.fillStyle = '#F5F3FF';
-    ctx.fillText(value, x, y + 22);
-  };
-
   // Left Column
-  drawStat('Rizz Level', stats.rizzLevel || '10/10', leftColX, statsTopY);
-  drawStat('Flag Status', stats.flagStatus || 'Green?', leftColX, statsTopY + lineSpacing);
+  ctx.fillText(`Rizz Level - ${stats.rizzLevel || '10/10'}`, leftColX, statsTopY);
+  ctx.fillText(`Flag Status - ${stats.flagStatus || 'Green?'}`, leftColX, statsTopY + lineSpacing);
 
   // Right Column
-  drawStat('Aura Points', stats.auraPoints || '1000+', rightColX, statsTopY);
-  drawStat('Social Battery', stats.socialBattery || 'LOW', rightColX, statsTopY + lineSpacing);
+  ctx.fillText(`Aura Points - ${stats.auraPoints || '1000+'}`, rightColX, statsTopY);
+  ctx.fillText(`Social Battery - ${stats.socialBattery || 'LOW'}`, rightColX, statsTopY + lineSpacing);
 
-  // 6. Bottom Footer: AWSnap by AWS SBG NMIET
-  const footerY = 1080;
-  ctx.textAlign = 'center';
+  // 6. Bottom Footer: AWSnap by AWS SBG NMIET (Single line, centered)
+  const footerY = 1070;
+  ctx.textBaseline = 'middle';
 
-  // "AWSnap" in bold purple pixel font
-  ctx.font = 'bold 38px "Press Start 2P", monospace';
-  ctx.fillStyle = '#4C1D95';
-  ctx.fillText('AWSnap', width / 2 + 2, footerY + 2);
+  const awsText = 'AWSnap';
+  const sbgText = ' by AWS SBG NMIET';
+
+  ctx.font = 'bold 28px "Press Start 2P", monospace';
+  const w1 = ctx.measureText(awsText).width;
+  ctx.font = '20px "Press Start 2P", monospace';
+  const w2 = ctx.measureText(sbgText).width;
+  const totalW = w1 + w2;
+  const startX = width / 2 - totalW / 2;
+
+  ctx.textAlign = 'left';
+  ctx.font = 'bold 28px "Press Start 2P", monospace';
   ctx.fillStyle = '#A855F7';
-  ctx.fillText('AWSnap', width / 2, footerY);
+  ctx.fillText(awsText, startX, footerY);
 
-  // "by AWS SBG NMIET" in smaller clean text
-  ctx.font = '600 20px "Space Grotesk", sans-serif';
-  ctx.fillStyle = '#B8AECF';
-  ctx.fillText('by AWS SBG NMIET', width / 2, footerY + 45);
+  ctx.font = '20px "Press Start 2P", monospace';
+  ctx.fillText(sbgText, startX + w1, footerY);
 
   return canvas;
 }
