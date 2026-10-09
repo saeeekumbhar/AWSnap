@@ -41,7 +41,7 @@ export const AvatarCard: React.FC<AvatarCardProps> = ({
 
   return (
     <div
-      className={`relative w-full max-w-[350px] sm:max-w-[375px] bg-[#141A23] rounded-sm p-4 sm:p-5 flex flex-col items-center justify-between border border-[#273244] shadow-2xl select-none overflow-hidden ${className}`}
+      className={`relative w-full max-w-[410px] sm:max-w-[430px] bg-[#141A23] rounded-sm p-5 sm:p-6 flex flex-col items-center justify-between border border-[#273244] shadow-2xl select-none overflow-hidden ${className}`}
       style={{
         backgroundImage:
           'linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px)',
@@ -50,15 +50,15 @@ export const AvatarCard: React.FC<AvatarCardProps> = ({
       }}
     >
       {/* 1. Top Heading: Centered Pixel Name */}
-      <div className="w-full text-center pt-0.5 pb-2">
-        <h2 className="font-pixel text-base sm:text-lg font-bold tracking-wider text-[#A855F7] truncate drop-shadow-[0_2px_4px_rgba(168,85,247,0.4)]">
+      <div className="w-full text-center pt-0.5 pb-2.5">
+        <h2 className="font-pixel text-lg sm:text-xl font-bold tracking-wider text-[#A855F7] truncate drop-shadow-[0_2px_4px_rgba(168,85,247,0.4)]">
           {displayName}
         </h2>
       </div>
 
       {/* 2. Center Chip Frame with Microchip Teeth & Pixelated Avatar */}
       <div className="relative my-auto flex items-center justify-center">
-        <div className="relative w-[240px] h-[240px] sm:w-[260px] sm:h-[260px]">
+        <div className="relative w-[297px] h-[297px] sm:w-[324px] sm:h-[324px]">
           {/* Purple block SVG frame */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none z-10"
@@ -100,24 +100,24 @@ export const AvatarCard: React.FC<AvatarCardProps> = ({
       </div>
 
       {/* 3. Stats Section: Raw Purple Pixel Text in Two Columns */}
-      <div className="w-full max-w-[310px] px-2 pt-3 sm:pt-4 pb-2 flex justify-between items-center text-[#A855F7] font-pixel text-[8.5px] sm:text-[9.5px] leading-relaxed">
+      <div className="w-full max-w-[340px] px-2 pt-4 sm:pt-5 pb-2.5 flex justify-between items-center text-[#A855F7] font-pixel text-[9.5px] sm:text-[10.5px] leading-relaxed">
         {/* Left Column */}
-        <div className="flex flex-col gap-1.5 text-left">
+        <div className="flex flex-col gap-2 text-left">
           <div>Rizz Level - {stats.rizzLevel || '10/10'}</div>
           <div>Flag Status - {stats.flagStatus || 'Green?'}</div>
         </div>
 
         {/* Right Column */}
-        <div className="flex flex-col gap-1.5 text-left">
+        <div className="flex flex-col gap-2 text-left">
           <div>Aura Points - {stats.auraPoints || '1000+'}</div>
           <div>Social Battery - {stats.socialBattery || 'LOW'}</div>
         </div>
       </div>
 
       {/* 4. Footer: AWSnap by AWS SBG NMIET */}
-      <div className="w-full text-center pt-1.5 pb-0.5 font-pixel text-[#A855F7]">
-        <span className="text-xs sm:text-sm font-bold tracking-wider">AWSnap</span>{' '}
-        <span className="text-[9px] sm:text-[10px] tracking-wide text-[#A855F7]">by AWS SBG NMIET</span>
+      <div className="w-full text-center pt-2 pb-0.5 font-pixel text-[#A855F7]">
+        <span className="text-sm sm:text-base font-bold tracking-wider">AWSnap</span>{' '}
+        <span className="text-[10px] sm:text-xs tracking-wide text-[#A855F7]">by AWS SBG NMIET</span>
       </div>
     </div>
   );
