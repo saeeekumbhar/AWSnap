@@ -67,118 +67,149 @@ async function startServer() {
           characterDescription: "AWS Student Builder ready for production deployment."
         });
       }
-      const prompt = `Analyze this webcam photograph of a person. You are generating an authentic Minecraft-style 8-bit character avatar for them at the AWS Student Builders Guild NMIET photo booth.
+      const prompt = `You are a master 8-bit retro pixel art character designer for the AWSnap photo booth at AWS Student Builders Guild NMIET.
+Analyze this visitor webcam photo and create an authentic, personalized 8-bit pixel art character avatar profile inspired by high-quality retro game and anime pixel art portraits.
 
-Examine the person in the photo and extract their visual characteristics so they can be turned into a blocky Minecraft human character:
-1. Skin tone: closest hex code (e.g. #FCD0B4, #E0AA8B, #C68642, #8D5524, #5C3836)
-2. Hair color: closest hex code (e.g. #2C221E, #4A3728, #B58150, #E6BE8A, #A52A2A, #808080)
-3. Hair style: one of ["short", "parted", "spiky", "curly", "wavy", "long", "bun", "buzzcut", "bald"]
-4. Eye color: closest hex code (e.g. #3B2F2F, #3D5A80, #588157, #6B4E71, #2B2B2B)
-5. Glasses: boolean (true if wearing eyeglasses or sunglasses)
-6. Glasses color: hex code if present, else "#000000"
-7. Facial hair: boolean (true if beard, mustache or goatee present)
-8. Beard color: hex code if present
-9. Clothing primary color: dominant color of their shirt/jacket/top (hex code)
-10. Clothing secondary color: accent or secondary clothing color (hex code)
-11. Clothing style: one of ["tshirt", "hoodie", "jacket", "shirt", "sweater"]
-12. Expression: one of ["smile", "grin", "neutral", "confident"]
+Examine the person in the photo and extract their visual characteristics so they get a UNIQUE, NON-GENERIC pixel art portrait matching their real look:
 
-Also generate 4 fun AWS community event card stats:
-- rizzLevel: usually "10/10", "11/10", "Over 9000", or "100%"
-- flagStatus: usually "Green?", "Super Green", "All Green", or "Certified Green"
-- auraPoints: usually "1000+", "5000+", "9999+", or "+Infinity"
-- socialBattery: usually "LOW", "CHARGING", "42%", or "REBOOTING"
+1. Archetype / Vibe: Choose the best matching style from:
+   ["retro_hoodie", "anime_pixel", "minecraft_scenic", "aesthetic_bob", "curly_retro"]
 
-Respond strictly with valid JSON without markdown fences. Format:
-{
-  "skinTone": "#hex",
-  "hairColor": "#hex",
-  "hairStyle": "string",
-  "eyeColor": "#hex",
-  "hasGlasses": false,
-  "glassesColor": "#hex",
-  "hasBeard": false,
-  "beardColor": "#hex",
-  "clothingPrimary": "#hex",
-  "clothingSecondary": "#hex",
-  "clothingStyle": "string",
-  "expression": "string",
-  "stats": {
-    "rizzLevel": "10/10",
-    "flagStatus": "Green?",
-    "auraPoints": "1000+",
-    "socialBattery": "LOW"
-  },
-  "characterDescription": "string"
-}`;
-      const response = await ai.models.generateContent({
-        model: "gemini-3.8-flash",
-        contents: [
-          {
-            role: "user",
-            parts: [
+2. Skin tone:
+   - skinTone: accurate base skin hex (e.g. #FCD0B4, #F5C29B, #D49B72, #99603B, #5C3A21, etc.)
+   - skinShade: darker contour/shadow hex for jaw and neck
+   - skinHighlight: subtle lighter highlight hex for forehead/nose
+   - hasBlush: true if rosy cheeks or freckles visible
+
+3. Hair:
+   - hairStyle: one of [
+       "messy_bun_clip",      // top bun with loose side strands and hair clip (like anime pixel art)
+       "minecraft_wavy",      // textured wavy layered hair
+       "curly_volume",        // voluminous curly hair with defined curl clusters
+       "messy_anime_layers",  // layered parted anime bangs framing face
+       "bob_straight_bangs",  // classic sleek bob cut with straight bangs
+       "long_wavy_flow",      // long flowing hair over shoulders
+       "short_textured_fade", // clean modern fade/crop
+       "spiky_anime",         // textured spiky locks
+       "side_swept"           // side-parted clean sweep
+     ]
+   - hairColor: accurate base hex
+   - hairHighlight: lighter strand highlight hex
+   - hairShadow: deeper shadow hex
+   - hasHairClip: boolean (true if hair clip or accessory visible)
+
+4. Eyeglasses:
+   - hasGlasses: boolean (true if wearing eyeglasses or sunglasses)
+   - glassesStyle: "round_wire" | "thick_rectangular" | "oval_rimless" | "sunglasses" | "none"
+   - glassesColor: hex code (e.g. #161D26, #8D5524, #A855F7, etc.)
+
+5. Facial Hair:
+   - hasFacialHair: boolean (true if beard, mustache or stubble)
+   - facialHairStyle: "full_beard_mustache" | "goatee" | "stubble" | "none"
+   - beardColor: hex code
+
+6. Eyes & Expression:
+   - eyeColor: hex code
+   - eyeStyle: "anime_sparkle" | "warm_friendly" | "cool_relaxed" | "squinting_smile"
+   - expression: "smile" | "grin" | "calm" | "confident" | "cute_smirk"
+
+7. Clothing:
+   - clothingType: "hoodie_drawstrings" | "sweater_necklace" | "zipper_polo" | "graphic_tee" | "jacket_over_shirt"
+   - clothingPrimary: dominant color of their shirt/top (hex code)
+   - clothingSecondary: accent color for drawstrings/collar/zipper (hex code)
+   - clothingDetail: "swoosh" | "chain" | "zipper" | "drawstrings" | "none"
+
+8. Accessories:
+   - hasEarrings: boolean (true if earrings visible)
+   - hasNecklace: boolean (true if necklace visible)
+
+9. Background:
+   - backgroundStyle: "sunflower_field" | "pastel_sky_blue" | "aesthetic_purple" | "warm_cream_studio" | "clean_white_minimal"
+   - backgroundColor: hex code
+
+10. Event Stats:
+   - rizzLevel: e.g. "10/10", "11/10", "Over 9000", "100%", "Certified", "W Rizz"
+   - flagStatus: e.g. "Green?", "Super Green", "All Green", "Clean Green", "Green Flag"
+   - auraPoints: e.g. "1000+", "5000+", "9999+", "+Infinity", "10,000+"
+   - socialBattery: e.g. "LOW", "CHARGING", "42%", "REBOOTING", "FULL"
+   - characterDescription: one-sentence fun character title
+
+Respond strictly with valid JSON without markdown fences.`;
+      const candidateModels = ["gemini-2.5-flash", "gemini-3.8-flash", "gemini-flash-latest"];
+      let responseText = "";
+      for (const modelName of candidateModels) {
+        try {
+          const response = await ai.models.generateContent({
+            model: modelName,
+            contents: [
               {
-                inlineData: {
-                  mimeType,
-                  data: cleanBase64
-                }
-              },
-              {
-                text: prompt
+                role: "user",
+                parts: [
+                  {
+                    inlineData: {
+                      mimeType,
+                      data: cleanBase64
+                    }
+                  },
+                  {
+                    text: prompt
+                  }
+                ]
               }
             ]
+          });
+          if (response && response.text) {
+            responseText = response.text.trim();
+            break;
           }
-        ]
-      });
-      const responseText = response.text ? response.text.trim() : "";
+        } catch (mErr) {
+          console.warn(`Model ${modelName} call failed, trying next:`, mErr?.message || mErr);
+        }
+      }
       let cleanJson = responseText;
       if (cleanJson.startsWith("```json")) {
         cleanJson = cleanJson.replace(/^```json\s*/, "").replace(/\s*```$/, "");
       } else if (cleanJson.startsWith("```")) {
         cleanJson = cleanJson.replace(/^```\s*/, "").replace(/\s*```$/, "");
       }
-      let parsedData;
+      let parsedData = {};
       try {
-        parsedData = JSON.parse(cleanJson);
+        if (cleanJson) {
+          parsedData = JSON.parse(cleanJson);
+        }
       } catch (parseErr) {
         console.warn("Failed to parse Gemini response as JSON:", responseText);
-        parsedData = {
-          skinTone: "#E0AA8B",
-          hairColor: "#4A2E1B",
-          hairStyle: "short",
-          eyeColor: "#2B4A6F",
-          hasGlasses: false,
-          glassesColor: "#161D26",
-          hasBeard: false,
-          beardColor: "#4A2E1B",
-          clothingPrimary: "#FF9900",
-          clothingSecondary: "#6B21A8",
-          clothingStyle: "hoodie",
-          expression: "confident",
-          stats: {
-            rizzLevel: "10/10",
-            flagStatus: "Green?",
-            auraPoints: "1000+",
-            socialBattery: "LOW"
-          },
-          characterDescription: "AWS Student Builder Minecraft Avatar"
-        };
       }
       return res.json({
         success: true,
         traits: {
+          archetype: parsedData.archetype || "retro_hoodie",
           skinTone: parsedData.skinTone || "#E0AA8B",
-          hairColor: parsedData.hairColor || "#4A2E1B",
-          hairStyle: parsedData.hairStyle || "short",
+          skinShade: parsedData.skinShade || "#C58F6E",
+          skinHighlight: parsedData.skinHighlight || "#FADBC7",
+          hasBlush: Boolean(parsedData.hasBlush),
+          hairStyle: parsedData.hairStyle || "curly_volume",
+          hairColor: parsedData.hairColor || "#3C2817",
+          hairHighlight: parsedData.hairHighlight || "#5A3D22",
+          hairShadow: parsedData.hairShadow || "#26190E",
+          hasHairClip: Boolean(parsedData.hasHairClip),
           eyeColor: parsedData.eyeColor || "#2B4A6F",
+          eyeStyle: parsedData.eyeStyle || "warm_friendly",
           hasGlasses: Boolean(parsedData.hasGlasses),
+          glassesStyle: parsedData.glassesStyle || (parsedData.hasGlasses ? "thick_rectangular" : "none"),
           glassesColor: parsedData.glassesColor || "#161D26",
-          hasBeard: Boolean(parsedData.hasBeard),
-          beardColor: parsedData.beardColor || parsedData.hairColor || "#4A2E1B",
-          clothingPrimary: parsedData.clothingPrimary || "#FF9900",
-          clothingSecondary: parsedData.clothingSecondary || "#6B21A8",
-          clothingStyle: parsedData.clothingStyle || "hoodie",
-          expression: parsedData.expression || "confident"
+          hasFacialHair: Boolean(parsedData.hasFacialHair || parsedData.hasBeard),
+          facialHairStyle: parsedData.facialHairStyle || (parsedData.hasBeard ? "full_beard_mustache" : "none"),
+          beardColor: parsedData.beardColor || parsedData.hairColor || "#3C2817",
+          clothingType: parsedData.clothingType || "hoodie_drawstrings",
+          clothingPrimary: parsedData.clothingPrimary || "#2E7D32",
+          clothingSecondary: parsedData.clothingSecondary || "#D32F2F",
+          clothingDetail: parsedData.clothingDetail || "drawstrings",
+          hasEarrings: Boolean(parsedData.hasEarrings),
+          hasNecklace: Boolean(parsedData.hasNecklace),
+          backgroundStyle: parsedData.backgroundStyle || "pastel_sky_blue",
+          backgroundColor: parsedData.backgroundColor || "#88BEE8",
+          expression: parsedData.expression || "smile"
         },
         stats: {
           rizzLevel: parsedData.stats?.rizzLevel || "10/10",
@@ -186,25 +217,40 @@ Respond strictly with valid JSON without markdown fences. Format:
           auraPoints: parsedData.stats?.auraPoints || "1000+",
           socialBattery: parsedData.stats?.socialBattery || "LOW"
         },
-        characterDescription: parsedData.characterDescription || "Reconstructed Minecraft 8-bit Character"
+        characterDescription: parsedData.characterDescription || "AWS Student Builder 8-bit Avatar"
       });
     } catch (err) {
       console.error("Error generating avatar:", err);
       return res.status(500).json({
         error: err.message || "Avatar generation failed",
         fallbackTraits: {
+          archetype: "retro_hoodie",
           skinTone: "#E0AA8B",
-          hairColor: "#4A2E1B",
-          hairStyle: "short",
+          skinShade: "#C58F6E",
+          skinHighlight: "#FADBC7",
+          hasBlush: true,
+          hairStyle: "curly_volume",
+          hairColor: "#3C2817",
+          hairHighlight: "#5A3D22",
+          hairShadow: "#26190E",
+          hasHairClip: false,
           eyeColor: "#2B4A6F",
-          hasGlasses: false,
+          eyeStyle: "warm_friendly",
+          hasGlasses: true,
+          glassesStyle: "thick_rectangular",
           glassesColor: "#161D26",
-          hasBeard: false,
-          beardColor: "#4A2E1B",
-          clothingPrimary: "#FF9900",
-          clothingSecondary: "#6B21A8",
-          clothingStyle: "hoodie",
-          expression: "confident",
+          hasFacialHair: false,
+          facialHairStyle: "none",
+          beardColor: "#3C2817",
+          clothingType: "hoodie_drawstrings",
+          clothingPrimary: "#2E7D32",
+          clothingSecondary: "#D32F2F",
+          clothingDetail: "drawstrings",
+          hasEarrings: false,
+          hasNecklace: false,
+          backgroundStyle: "pastel_sky_blue",
+          backgroundColor: "#88BEE8",
+          expression: "smile",
           stats: {
             rizzLevel: "10/10",
             flagStatus: "Green?",
