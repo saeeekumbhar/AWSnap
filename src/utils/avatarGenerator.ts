@@ -7,6 +7,7 @@
 export interface AvatarTraits {
   gender?: 'female' | 'male';
   isFemale?: boolean;
+  faceShape?: 'oval' | 'round' | 'square' | 'heart' | 'angular';
   archetype?: 'retro_hoodie' | 'anime_pixel' | 'minecraft_scenic' | 'aesthetic_bob' | 'curly_retro';
   skinTone: string;
   skinShade?: string;
@@ -331,19 +332,34 @@ function renderHead(ctx: CanvasRenderingContext2D, traits: AvatarTraits) {
   ctx.fillStyle = skin;
   ctx.fillRect(isFemale ? 21 : 21, 27, isFemale ? 6 : 6, 5);
 
-  // Face Oval
+  // Face Shape and Jawline (Identity Preservation)
   ctx.fillStyle = skin;
+  const isSquare = traits.faceShape === 'square' || traits.faceShape === 'angular';
+  const isRound = traits.faceShape === 'round';
+  const isHeart = traits.faceShape === 'heart';
+
   for (let y = 12; y <= 27; y++) {
     let startX = 14;
     let endX = 33;
 
     if (y < 14) {
-      startX = 16;
-      endX = 31;
+      startX = isSquare ? 15 : 16;
+      endX = isSquare ? 32 : 31;
     } else if (y >= 25) {
       const taper = y - 24;
-      startX = isFemale ? 15 + taper * 2 : 14 + taper * 2;
-      endX = isFemale ? 32 - taper * 2 : 33 - taper * 2;
+      if (isSquare) {
+        startX = 14 + taper;
+        endX = 33 - taper;
+      } else if (isRound) {
+        startX = 15 + taper * 2;
+        endX = 32 - taper * 2;
+      } else if (isHeart) {
+        startX = 15 + taper * 3;
+        endX = 32 - taper * 3;
+      } else {
+        startX = isFemale ? 15 + taper * 2 : 14 + taper * 2;
+        endX = isFemale ? 32 - taper * 2 : 33 - taper * 2;
+      }
     }
 
     ctx.fillRect(startX, y, endX - startX + 1, 1);

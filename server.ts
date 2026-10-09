@@ -88,14 +88,26 @@ async function startServer() {
       console.log(`[AWSnap API] Received avatar generation request (${cleanBase64.length} chars)`);
 
       // Call Gemini Vision to analyze the visitor's photo with structured JSON
-      const prompt = `Analyze this real photograph of a person taken at the AWSnap event photo booth.
-Your task is to accurately extract their real visual features so we can generate an authentic, personalized 8-bit retro pixel art avatar portrait that truly looks like THEM.
+      const prompt = `Transform the person in the provided photograph into a recognizable retro 8-bit / video-game character portrait.
+
+IDENTITY PRESERVATION IS THE HIGHEST PRIORITY.
+
+Preserve the person's recognizable facial structure, face shape, skin tone, hairstyle, hair color, glasses, facial hair if present, expression, clothing colors, and other distinctive visible features.
+
+Render the person using clearly visible square pixel clusters, a limited retro-game color palette, crisp hard edges, and authentic classic RPG character-art aesthetics.
+
+Keep the person's pose and composition consistent with the original photograph. 
+
+Do not invent a different person. Do not replace the subject with a generic avatar, stock portrait, or random character. Do not produce a photorealistic image. Do not add text, logos, borders, or interface elements.
+
+The output must be a pixel-art transformation of the supplied photograph, not a newly invented character.
 
 CRITICAL INSTRUCTIONS:
-1. GENDER & PRESENTATION:
+1. GENDER & FACIAL STRUCTURE:
    - Carefully determine if the person presents as female or male.
    - For a female, set isFemale: true and gender: "female".
    - For a male, set isFemale: false and gender: "male".
+   - faceShape: "oval" | "round" | "square" | "heart" | "angular".
    - Feminine avatars will get delicate facial features, anime eye lashes, soft lips, and authentic female hair/outfit options.
 
 2. REAL CLOTHING & OUTFIT (LOOK CAREFULLY AT WHAT THEY ARE ACTUALLY WEARING):
@@ -212,6 +224,7 @@ Return valid JSON with these fields.`;
       const detectedTraits = {
         gender: isFemale ? 'female' : 'male',
         isFemale,
+        faceShape: parsedData.faceShape || (isFemale ? 'oval' : 'angular'),
         archetype: parsedData.archetype || (isFemale ? 'anime_pixel' : 'retro_hoodie'),
         skinTone: parsedData.skinTone || (isFemale ? '#FCD0B4' : '#E0AA8B'),
         skinShade: parsedData.skinShade || (isFemale ? '#E8B69A' : '#C58F6E'),
