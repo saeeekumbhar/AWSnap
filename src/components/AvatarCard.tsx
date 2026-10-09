@@ -41,7 +41,7 @@ export const AvatarCard: React.FC<AvatarCardProps> = ({
 
   return (
     <div
-      className={`relative w-full max-w-[410px] sm:max-w-[430px] bg-[#141A23] rounded-sm p-5 sm:p-6 flex flex-col items-center justify-between border border-[#273244] shadow-2xl select-none overflow-hidden ${className}`}
+      className={`relative w-full max-w-[440px] sm:max-w-[460px] bg-[#141A23] rounded-sm p-5 sm:p-6 flex flex-col items-center justify-between border border-[#273244] shadow-2xl select-none overflow-hidden ${className}`}
       style={{
         backgroundImage:
           'linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px)',
@@ -50,15 +50,15 @@ export const AvatarCard: React.FC<AvatarCardProps> = ({
       }}
     >
       {/* 1. Top Heading: Centered Pixel Name */}
-      <div className="w-full text-center pt-0.5 pb-2.5">
-        <h2 className="font-pixel text-lg sm:text-xl font-bold tracking-wider text-[#A855F7] truncate drop-shadow-[0_2px_4px_rgba(168,85,247,0.4)]">
+      <div className="w-full text-center pt-0.5 pb-3">
+        <h2 className="font-pixel text-xl sm:text-2xl font-bold tracking-wider text-[#A855F7] truncate drop-shadow-[0_2px_4px_rgba(168,85,247,0.4)]">
           {displayName}
         </h2>
       </div>
 
       {/* 2. Center Chip Frame with Microchip Teeth & Pixelated Avatar */}
       <div className="relative my-auto flex items-center justify-center">
-        <div className="relative w-[297px] h-[297px] sm:w-[324px] sm:h-[324px]">
+        <div className="relative w-[324px] h-[324px] sm:w-[350px] sm:h-[350px]">
           {/* Purple block SVG frame */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none z-10"
@@ -100,7 +100,7 @@ export const AvatarCard: React.FC<AvatarCardProps> = ({
       </div>
 
       {/* 3. Stats Section: Raw Purple Pixel Text in Two Columns */}
-      <div className="w-full max-w-[340px] px-2 pt-4 sm:pt-5 pb-2.5 flex justify-between items-center text-[#A855F7] font-pixel text-[9.5px] sm:text-[10.5px] leading-relaxed">
+      <div className="w-full max-w-[360px] px-2 pt-4 sm:pt-5 pb-2.5 flex justify-between items-center text-[#A855F7] font-pixel text-[10px] sm:text-[11px] leading-relaxed">
         {/* Left Column */}
         <div className="flex flex-col gap-2 text-left">
           <div>Rizz Level - {stats.rizzLevel || '10/10'}</div>
