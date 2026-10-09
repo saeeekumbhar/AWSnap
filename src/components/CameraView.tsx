@@ -148,12 +148,12 @@ export const CameraView: React.FC<CameraViewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col items-center px-4 py-6 sm:py-10">
+    <div className="w-full max-w-5xl mx-auto flex flex-col items-center px-4 py-4 sm:py-8">
       {/* Hidden canvas for capturing video frames */}
       <canvas ref={canvasRef} className="hidden" />
 
       {/* Main Heading with Typing Animation */}
-      <div className="text-center mb-6 sm:mb-8">
+      <div className="text-center mb-6">
         <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#F5F3FF] font-sans mb-2">
           <TypewriterText text="Get your AWS avatar." speed={60} />
         </h1>
@@ -162,134 +162,140 @@ export const CameraView: React.FC<CameraViewProps> = ({
         </p>
       </div>
 
-      {/* Camera Area Frame */}
-      <div className="relative w-full max-w-[540px] aspect-[4/3] sm:aspect-square bg-[#121820] rounded-xl overflow-hidden border-2 border-[#6B21A8] shadow-[0_0_24px_rgba(107,33,168,0.25)] flex items-center justify-center">
-        {/* Subtle decorative stepped pixel corners */}
-        <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-[#A855F7] z-10 pointer-events-none" />
-        <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-[#A855F7] z-10 pointer-events-none" />
-        <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-[#A855F7] z-10 pointer-events-none" />
-        <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-[#A855F7] z-10 pointer-events-none" />
+      {/* Main Booth Layout: Preview on Left, Controls on Right */}
+      <div className="w-full flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10">
+        {/* Camera Area Frame */}
+        <div className="relative w-full max-w-[500px] aspect-[4/3] sm:aspect-square bg-[#121820] rounded-xl overflow-hidden border-2 border-[#6B21A8] shadow-[0_0_24px_rgba(107,33,168,0.25)] flex items-center justify-center flex-shrink-0">
+          {/* Subtle decorative stepped pixel corners */}
+          <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-[#A855F7] z-10 pointer-events-none" />
+          <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-[#A855F7] z-10 pointer-events-none" />
+          <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-[#A855F7] z-10 pointer-events-none" />
+          <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-[#A855F7] z-10 pointer-events-none" />
 
-        {/* Live Camera Feed */}
-        {!cameraError && (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className="w-full h-full object-cover scale-x-[-1]" // mirrored for natural selfie experience
-          />
-        )}
+          {/* Live Camera Feed */}
+          {!cameraError && (
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover scale-x-[-1]" // mirrored for natural selfie experience
+            />
+          )}
 
-        {/* Loading Camera State */}
-        {isInitializing && (
-          <div className="absolute inset-0 bg-[#161D26]/90 flex flex-col items-center justify-center gap-3 z-10">
-            <RefreshCw className="w-8 h-8 text-[#A855F7] animate-spin" />
-            <p className="text-sm text-[#B8AECF] font-mono">Initializing camera feed...</p>
-          </div>
-        )}
-
-        {/* Camera Permission / Error State */}
-        {cameraError && (
-          <div className="absolute inset-0 bg-[#161D26] p-6 flex flex-col items-center justify-center text-center gap-4 z-10">
-            <div className="w-12 h-12 rounded-full bg-red-950/60 border border-red-500/40 flex items-center justify-center text-red-400">
-              <AlertCircle className="w-6 h-6" />
+          {/* Loading Camera State */}
+          {isInitializing && (
+            <div className="absolute inset-0 bg-[#161D26]/90 flex flex-col items-center justify-center gap-3 z-10">
+              <RefreshCw className="w-8 h-8 text-[#A855F7] animate-spin" />
+              <p className="text-sm text-[#B8AECF] font-mono">Initializing camera feed...</p>
             </div>
-            <div>
-              <h3 className="text-base font-bold text-[#F5F3FF] mb-1">Camera Unavailable</h3>
-              <p className="text-xs sm:text-sm text-[#B8AECF] max-w-sm">{cameraError}</p>
+          )}
+
+          {/* Camera Permission / Error State */}
+          {cameraError && (
+            <div className="absolute inset-0 bg-[#161D26] p-6 flex flex-col items-center justify-center text-center gap-4 z-10">
+              <div className="w-12 h-12 rounded-full bg-red-950/60 border border-red-500/40 flex items-center justify-center text-red-400">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-[#F5F3FF] mb-1">Camera Unavailable</h3>
+                <p className="text-xs sm:text-sm text-[#B8AECF] max-w-sm">{cameraError}</p>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
+                <button
+                  onClick={startCamera}
+                  className="px-4 py-2 rounded bg-[#6B21A8] hover:bg-[#7E22CE] text-white text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" /> Retry Camera
+                </button>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-4 py-2 rounded bg-[#2E2640] hover:bg-[#3B3252] text-[#F5F3FF] border border-[#A855F7]/40 text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"
+                >
+                  <Upload className="w-3.5 h-3.5" /> Upload Photo
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
-              <button
-                onClick={startCamera}
-                className="px-4 py-2 rounded bg-[#6B21A8] hover:bg-[#7E22CE] text-white text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"
-              >
-                <RefreshCw className="w-3.5 h-3.5" /> Retry Camera
-              </button>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="px-4 py-2 rounded bg-[#2E2640] hover:bg-[#3B3252] text-[#F5F3FF] border border-[#A855F7]/40 text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"
-              >
-                <Upload className="w-3.5 h-3.5" /> Upload Photo
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
+          )}
+
+          {/* Countdown Overlay (3, 2, 1) */}
+          {countdown !== null && (
+            <div className="absolute inset-0 bg-black/45 backdrop-blur-[2px] flex items-center justify-center z-20">
+              <div className="font-pixel text-7xl sm:text-9xl text-[#FF9900] animate-bounce drop-shadow-[0_4px_16px_rgba(255,153,0,0.6)]">
+                {countdown}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Countdown Overlay (3, 2, 1) */}
-        {countdown !== null && (
-          <div className="absolute inset-0 bg-black/45 backdrop-blur-[2px] flex items-center justify-center z-20">
-            <div className="font-pixel text-7xl sm:text-9xl text-[#FF9900] animate-bounce drop-shadow-[0_4px_16px_rgba(255,153,0,0.6)]">
-              {countdown}
+          {/* Camera Shutter Flash */}
+          {flash && (
+            <div className="absolute inset-0 bg-white z-30 transition-opacity duration-150" />
+          )}
+
+          {/* Live indicator dot */}
+          {!cameraError && !isInitializing && (
+            <div className="absolute top-4 left-4 flex items-center gap-2 px-2.5 py-1 rounded bg-[#161D26]/80 backdrop-blur-sm border border-[#A855F7]/30 text-[11px] font-mono text-[#F5F3FF] z-10 pointer-events-none">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+              <span>LIVE BOOTH</span>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Camera Shutter Flash */}
-        {flash && (
-          <div className="absolute inset-0 bg-white z-30 transition-opacity duration-150" />
-        )}
-
-        {/* Live indicator dot */}
-        {!cameraError && !isInitializing && (
-          <div className="absolute top-4 left-4 flex items-center gap-2 px-2.5 py-1 rounded bg-[#161D26]/80 backdrop-blur-sm border border-[#A855F7]/30 text-[11px] font-mono text-[#F5F3FF] z-10 pointer-events-none">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-            <span>LIVE BOOTH</span>
-          </div>
-        )}
-      </div>
-
-      {/* Player Name Input Field */}
-      <div className="w-full max-w-[540px] mt-6 flex flex-col gap-1.5">
-        <label className="text-xs font-bold uppercase tracking-wider text-[#B8AECF] flex items-center justify-between">
-          <span>Card Player Name</span>
-          <span className="text-[10px] text-[#A855F7] font-mono">OPTIONAL</span>
-        </label>
-        <input
-          type="text"
-          value={playerName}
-          onChange={(e) => onPlayerNameChange(e.target.value.slice(0, 18))}
-          placeholder="PIXEL PLAYER"
-          className="w-full px-4 py-2.5 rounded-lg bg-[#121820] border border-[#3B3252] focus:border-[#A855F7] focus:outline-none text-[#F5F3FF] placeholder-[#645B7F] text-sm font-medium tracking-wide transition-colors"
-        />
-      </div>
-
-      {/* Capture Interaction Button */}
-      <div className="w-full max-w-[540px] mt-6">
-        <button
-          onClick={handleStartCapture}
-          disabled={isCapturing || !!cameraError || isInitializing}
-          className="w-full py-4 px-6 rounded-lg bg-[#FF9900] hover:bg-[#FFA826] active:bg-[#E68A00] disabled:bg-[#4B3E2F] disabled:text-[#8E7E6E] disabled:cursor-not-allowed text-[#161D26] font-pixel text-sm sm:text-base tracking-wider uppercase font-bold transition-all duration-150 transform active:scale-[0.99] shadow-[0_4px_20px_rgba(255,153,0,0.3)] flex items-center justify-center gap-3 cursor-pointer"
-        >
-          <Camera className="w-5 h-5 text-[#161D26]" />
-          <span>{isCapturing ? 'SNAPPING...' : 'CAPTURE MY AVATAR'}</span>
-        </button>
-
-        {/* Alternative upload trigger if user prefers */}
-        {!cameraError && (
-          <div className="mt-3 text-center">
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="text-xs text-[#B8AECF] hover:text-[#A855F7] transition-colors underline cursor-pointer"
-            >
-              Or upload an existing photo from laptop
-            </button>
+        {/* Right Side: Name Input & Capture Button */}
+        <div className="w-full max-w-[360px] flex flex-col justify-center gap-6">
+          {/* Player Name Input Field */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-[#B8AECF] flex items-center justify-between">
+              <span>Card Player Name</span>
+              <span className="text-[10px] text-[#A855F7] font-mono">OPTIONAL</span>
+            </label>
             <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileUpload}
-              className="hidden"
+              type="text"
+              value={playerName}
+              onChange={(e) => onPlayerNameChange(e.target.value.slice(0, 18))}
+              placeholder="PIXEL PLAYER"
+              className="w-full px-4 py-2.5 rounded-lg bg-[#121820] border border-[#3B3252] focus:border-[#A855F7] focus:outline-none text-[#F5F3FF] placeholder-[#645B7F] text-sm font-medium tracking-wide transition-colors"
             />
           </div>
-        )}
+
+          {/* Capture Interaction Button */}
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={handleStartCapture}
+              disabled={isCapturing || !!cameraError || isInitializing}
+              className="w-full py-4 px-6 rounded-lg bg-[#FF9900] hover:bg-[#FFA826] active:bg-[#E68A00] disabled:bg-[#4B3E2F] disabled:text-[#8E7E6E] disabled:cursor-not-allowed text-[#161D26] font-pixel text-sm sm:text-base tracking-wider uppercase font-bold transition-all duration-150 transform active:scale-[0.99] shadow-[0_4px_20px_rgba(255,153,0,0.3)] flex items-center justify-center gap-3 cursor-pointer"
+            >
+              <Camera className="w-5 h-5 text-[#161D26]" />
+              <span>{isCapturing ? 'SNAPPING...' : 'CAPTURE MY AVATAR'}</span>
+            </button>
+
+            {/* Alternative upload trigger if user prefers */}
+            {!cameraError && (
+              <div className="text-center">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-xs text-[#B8AECF] hover:text-[#A855F7] transition-colors underline cursor-pointer"
+                >
+                  Or upload an existing photo from laptop
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
